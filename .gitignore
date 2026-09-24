@@ -1,0 +1,7 @@
+dist/
+*.wasm
+*.wasm.sha256
+/.idea/
+/.vscode/
+*.swp
+.DS_Store

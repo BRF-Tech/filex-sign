@@ -1,0 +1,533 @@
+{
+  "manifest_version": 1,
+  "name": "sign",
+  "version": "0.1.0",
+  "label": {
+    "en": "e-Signature",
+    "tr": "e-İmza",
+    "es": "Firma electrónica",
+    "de": "E-Signatur",
+    "fr": "Signature électronique"
+  },
+  "description": {
+    "en": "Sign documents yourself or ask others to sign, inside filex: named boxes placed on the page, a step-by-step screen for both sides, a receipt for every signer, and a Verify report on any PDF. Spanish, German and French are AI-translated, awaiting review by a native speaker — corrections welcome.",
+    "tr": "Belgeleri kendiniz imzalayın ya da başkalarını imzaya çağırın; hepsi filex içinde: sayfaya yerleştirilen adlandırılmış kutular, iki taraf için de adım adım ekran, her imzacıya makbuz ve her PDF için Doğrula raporu. İspanyolca, Almanca ve Fransızca yapay zekâ çevirisidir; ana dili bu diller olan birinin gözden geçirmesini bekliyor — düzeltmeler memnuniyetle karşılanır.",
+    "es": "Firme documentos usted mismo o pida a otras personas que los firmen, dentro de filex: recuadros con nombre colocados en la página, una pantalla paso a paso para ambas partes, un recibo para cada firmante y un informe Verificar para cualquier PDF. El español, el alemán y el francés están traducidos con IA y esperan la revisión de un hablante nativo; se agradecen las correcciones.",
+    "de": "Unterschreiben Sie Dokumente selbst oder bitten Sie andere darum, direkt in filex: benannte Felder auf der Seite, ein Schritt-für-Schritt-Bildschirm für beide Seiten, ein Beleg für jeden Unterzeichner und ein Prüfbericht für jedes PDF. Spanisch, Deutsch und Französisch wurden von einer KI übersetzt und warten auf die Prüfung durch Muttersprachler — Korrekturen sind willkommen.",
+    "fr": "Signez des documents vous-même ou demandez à d’autres de les signer, dans filex : des zones nommées placées sur la page, un écran pas à pas pour les deux parties, un reçu pour chaque signataire et un rapport Vérifier pour tout PDF. L’espagnol, l’allemand et le français sont traduits par IA et attendent la relecture d’un locuteur natif ; les corrections sont les bienvenues."
+  },
+  "icon": "sign",
+  "homepage": "https://github.com/BRF-Tech/filex-sign",
+  "min_filex": "0.43.0",
+  "languages": [
+    "en",
+    "tr",
+    "es",
+    "de",
+    "fr"
+  ],
+  "permissions": [
+    "files:read",
+    "files:write",
+    "files:lock",
+    "sign",
+    "state",
+    "settings",
+    "public_pages",
+    "mail:send",
+    "notify:send",
+    "users:lookup",
+    "engines:libreoffice",
+    "http:freetsa.org",
+    "http:fonts.gstatic.com",
+    "schedule"
+  ],
+  "permission_reasons": {
+    "files:read": {
+      "en": "To read the document you sign or send.",
+      "tr": "İmzaladığınız ya da gönderdiğiniz belgeyi okumak için.",
+      "es": "Para leer el documento que firma o envía.",
+      "de": "Um das Dokument zu lesen, das Sie unterschreiben oder versenden.",
+      "fr": "Pour lire le document que vous signez ou envoyez."
+    },
+    "files:write": {
+      "en": "To write the signed document, the audit trail when you ask for one, and each signer's receipt.",
+      "tr": "İmzalı belgeyi, istediğinizde denetim izini ve her imzacının makbuzunu yazmak için.",
+      "es": "Para escribir el documento firmado, el registro de auditoría cuando lo pida y el recibo de cada firmante.",
+      "de": "Um das unterschriebene Dokument, auf Wunsch das Audit-Protokoll und den Beleg jedes Unterzeichners zu schreiben.",
+      "fr": "Pour écrire le document signé, le journal d’audit quand vous le demandez, et le reçu de chaque signataire."
+    },
+    "files:lock": {
+      "en": "To freeze the document read-only for everyone while its signatures are collected, and to keep the signed file locked for good once every signature is in — each only when you switch it on.",
+      "tr": "Açtığınızda: imzaları toplanırken belgeyi herkes için salt-okunur dondurmak ve her imza gelince imzalı dosyayı kalıcı olarak kilitli tutmak için.",
+      "es": "Para congelar el documento en solo lectura para todos mientras se recogen sus firmas, y para mantener el archivo firmado bloqueado de forma permanente cuando estén todas las firmas; cada cosa solo cuando usted la activa.",
+      "de": "Um das Dokument für alle schreibgeschützt einzufrieren, während Unterschriften gesammelt werden, und die unterschriebene Datei dauerhaft gesperrt zu halten, sobald alle Unterschriften vorliegen – beides nur, wenn Sie es einschalten.",
+      "fr": "Pour geler le document en lecture seule pour tous pendant la collecte des signatures, et garder le fichier signé verrouillé définitivement une fois toutes les signatures recueillies — chacun seulement si vous l’activez."
+    },
+    "sign": {
+      "en": "To have this installation's signing authority issue a certificate per signer and sign the document digest, and to seal a finished document with this installation's own seal. The private keys never leave filex; each signer's is destroyed the moment the signature is written.",
+      "tr": "Bu kurulumun imza makamından imzacı başına sertifika alıp belge özetini imzalatmak ve tamamlanan belgeyi bu kurulumun kendi mührüyle mühürlemek için. Özel anahtarlar filex'ten çıkmaz; her imzacınınki imza yazılır yazılmaz yok edilir.",
+      "es": "Para que la autoridad de certificación de esta instalación emita un certificado por firmante y firme el resumen del documento, y para sellar un documento terminado con el sello propio de esta instalación. Las claves privadas nunca salen de filex; la de cada firmante se destruye en cuanto se escribe la firma.",
+      "de": "Damit die Zertifizierungsstelle dieser Installation pro Unterzeichner ein Zertifikat ausstellt und den Hashwert des Dokuments signiert, und um ein fertiges Dokument mit dem eigenen Siegel dieser Installation zu versiegeln. Die privaten Schlüssel verlassen filex nie; der jedes Unterzeichners wird vernichtet, sobald die Unterschrift geschrieben ist.",
+      "fr": "Pour que l’autorité de certification de cette installation émette un certificat par signataire et signe l’empreinte du document, et pour sceller un document terminé avec le sceau propre à cette installation. Les clés privées ne quittent jamais filex ; celle de chaque signataire est détruite dès que la signature est écrite."
+    },
+    "state": {
+      "en": "To keep the signature request (signers, boxes, progress) with the document, to keep each signer's certificate so their receipt can be given again, to mark the documents that are waiting for a signature, and to list those marks on the Signatures screen — which only ever shows files you may already see.",
+      "tr": "İmza isteğini (imzacılar, kutular, ilerleme) belgeyle birlikte tutmak, makbuzu yeniden verilebilsin diye her imzacının sertifikasını saklamak, imza bekleyen belgeleri işaretlemek ve bu işaretleri İmzalar ekranında listelemek için — o ekran yalnızca zaten görebildiğiniz dosyaları gösterir.",
+      "es": "Para guardar la solicitud de firma (firmantes, recuadros, avance) con el documento, conservar el certificado de cada firmante para poder volver a entregar su recibo, marcar los documentos que esperan una firma y listar esas marcas en la pantalla Firmas, que solo muestra archivos que usted ya puede ver.",
+      "de": "Um die Unterschriftsanfrage (Unterzeichner, Felder, Fortschritt) beim Dokument zu speichern, das Zertifikat jedes Unterzeichners aufzubewahren, damit sein Beleg erneut ausgegeben werden kann, Dokumente zu markieren, die auf eine Unterschrift warten, und diese Markierungen im Bildschirm „Unterschriften“ aufzulisten – der nur Dateien zeigt, die Sie ohnehin sehen dürfen.",
+      "fr": "Pour conserver la demande de signature (signataires, zones, avancement) avec le document, garder le certificat de chaque signataire afin que son reçu puisse être redonné, marquer les documents en attente de signature et lister ces marques dans l’écran « Signatures » — qui n’affiche que des fichiers que vous pouvez déjà voir."
+    },
+    "settings": {
+      "en": "To read the two settings the administrator controls: whether signatures are time-stamped, and by which authority.",
+      "tr": "Yöneticinin belirlediği iki ayarı okumak için: imzalara zaman damgası vurulsun mu ve hangi makam tarafından.",
+      "es": "Para leer los dos ajustes que controla el administrador: si las firmas llevan sello de tiempo y de qué autoridad.",
+      "de": "Um die beiden Einstellungen zu lesen, die der Administrator festlegt: ob Unterschriften einen Zeitstempel erhalten und von welchem Dienst.",
+      "fr": "Pour lire les deux paramètres que l’administrateur contrôle : si les signatures sont horodatées, et par quelle autorité."
+    },
+    "public_pages": {
+      "en": "To open a filex share for each outside signer (their signing link, then their receipt) and one for the finished document — and to notice when somebody revokes or deletes one of those signing links on the Shares screen.",
+      "tr": "Dışarıdan her imzacı için birer filex paylaşımı (önce imza bağlantısı, sonra makbuz) ve tamamlanan belge için bir paylaşım açmak ve bu imza bağlantılarından biri Paylaşımlar ekranında iptal edildiğinde ya da silindiğinde bunu fark etmek için.",
+      "es": "Para abrir un enlace compartido de filex para cada firmante externo (primero su enlace de firma, luego su recibo) y otro para el documento terminado, y para detectar cuando alguien revoca o elimina uno de esos enlaces de firma en la pantalla Enlaces compartidos.",
+      "de": "Um für jeden externen Unterzeichner eine filex-Freigabe zu öffnen (zuerst seinen Unterschriftslink, dann seinen Beleg) und eine für das fertige Dokument – und um zu bemerken, wenn jemand einen dieser Unterschriftslinks im Bildschirm „Freigaben“ widerruft oder löscht.",
+      "fr": "Pour ouvrir un partage filex pour chaque signataire externe (d’abord son lien de signature, puis son reçu) et un pour le document terminé — et pour remarquer quand quelqu’un révoque ou supprime l’un de ces liens de signature dans l’écran « Partages »."
+    },
+    "mail:send": {
+      "en": "To e-mail a signer their link, their receipt and the finished document (a PIN is never in a mail).",
+      "tr": "İmzacıya bağlantısını, makbuzunu ve tamamlanan belgeyi e-postayla göndermek için (PIN asla e-postada olmaz).",
+      "es": "Para enviar por correo a un firmante su enlace, su recibo y el documento terminado (un PIN nunca va en un correo).",
+      "de": "Um einem Unterzeichner seinen Link, seinen Beleg und das fertige Dokument per E-Mail zu schicken (eine PIN steht nie in einer E-Mail).",
+      "fr": "Pour envoyer par e-mail à un signataire son lien, son reçu et le document terminé (un PIN ne figure jamais dans un e-mail)."
+    },
+    "notify:send": {
+      "en": "To ask a signer of this installation to sign, to hand them their receipt, and to tell the requester when somebody views, signs, refuses or when everything is done.",
+      "tr": "Bu kurulumdaki bir imzacıdan imza istemek, makbuzunu vermek ve birisi görüntülediğinde, imzaladığında, reddettiğinde ya da her şey bittiğinde istekçiye haber vermek için.",
+      "es": "Para pedir a un firmante de esta instalación que firme, entregarle su recibo y avisar al solicitante cuando alguien lo ve, firma, rechaza o cuando todo terminó.",
+      "de": "Um einen Unterzeichner dieser Installation um seine Unterschrift zu bitten, ihm seinen Beleg zu übergeben und die anfordernde Person zu benachrichtigen, wenn jemand ansieht, unterschreibt, ablehnt oder wenn alles erledigt ist.",
+      "fr": "Pour demander à un signataire de cette installation de signer, lui remettre son reçu, et prévenir le demandeur quand quelqu’un consulte, signe, refuse, ou quand tout est terminé."
+    },
+    "users:lookup": {
+      "en": "To pick signers from this installation's users.",
+      "tr": "İmzacıları bu kurulumun kullanıcılarından seçmek için.",
+      "es": "Para elegir firmantes entre los usuarios de esta instalación.",
+      "de": "Um Unterzeichner aus den Benutzern dieser Installation auszuwählen.",
+      "fr": "Pour choisir des signataires parmi les utilisateurs de cette installation."
+    },
+    "engines:libreoffice": {
+      "en": "To turn an office document (ODT, DOCX, XLSX, PPTX…) into the PDF a signature can live in.",
+      "tr": "Bir ofis belgesini (ODT, DOCX, XLSX, PPTX…) imzanın yaşayabileceği PDF'e çevirmek için.",
+      "es": "Para convertir un documento de oficina (ODT, DOCX, XLSX, PPTX…) en el PDF que puede contener una firma.",
+      "de": "Um ein Office-Dokument (ODT, DOCX, XLSX, PPTX…) in das PDF umzuwandeln, in dem eine Unterschrift stehen kann.",
+      "fr": "Pour transformer un document bureautique (ODT, DOCX, XLSX, PPTX…) en PDF, qui peut porter une signature."
+    },
+    "http:freetsa.org": {
+      "en": "Only when the administrator switches time stamping on: to ask a time-stamping authority to date a signature. The request carries the signature's digest and a nonce — never the document.",
+      "tr": "Yalnız yönetici zaman damgasını açtığında: bir zaman damgası makamından imzaya tarih atmasını istemek için. İstek imzanın özetini ve bir nonce taşır — belgeyi asla.",
+      "es": "Solo cuando el administrador activa el sellado de tiempo: para pedir a una autoridad de sellado de tiempo que feche una firma. La solicitud lleva el resumen de la firma y un nonce, nunca el documento.",
+      "de": "Nur wenn der Administrator Zeitstempel einschaltet: um einen Zeitstempeldienst zu bitten, eine Unterschrift zu datieren. Die Anfrage enthält den Hashwert der Unterschrift und eine Nonce – nie das Dokument.",
+      "fr": "Uniquement si l’administrateur active l’horodatage : pour demander à une autorité d’horodatage de dater une signature. La requête contient l’empreinte de la signature et un nonce — jamais le document."
+    },
+    "http:fonts.gstatic.com": {
+      "en": "Only when a document carries text in a script this app's own fonts do not draw (Arabic, Hebrew, Devanagari, Thai, Chinese, Japanese, Korean…): to download the one Noto font that script needs, once, from Google Fonts, and keep it. Every file is pinned by its SHA-256 and filex refuses any other bytes; nothing is sent but the file's address. Without this, such text is not printed and the screens say so before anybody signs.",
+      "tr": "Yalnız bir belgede bu uygulamanın kendi yazı tiplerinin çizmediği bir yazı sistemiyle metin (Arapça, İbranice, Devanagari, Tayca, Çince, Japonca, Korece…) geçtiğinde: o yazının gerektirdiği tek Noto yazı tipini Google Fonts'tan bir kez indirip saklamak için. Her dosya SHA-256 özetiyle sabitlenmiştir ve filex başka hiçbir baytı kabul etmez; dosyanın adresinden başka hiçbir şey gönderilmez. Bu izin olmadan böyle bir metin basılmaz ve ekranlar bunu imzadan önce söyler.",
+      "es": "Solo cuando un documento contiene texto en una escritura que las fuentes propias de esta aplicación no dibujan (árabe, hebreo, devanagari, tailandés, chino, japonés, coreano…): para descargar una vez de Google Fonts la única fuente Noto que necesita esa escritura, y conservarla. Cada archivo está fijado por su SHA-256 y filex rechaza cualquier otro contenido; no se envía nada salvo la dirección del archivo. Sin esto, ese texto no se imprime y las pantallas lo indican antes de que alguien firme.",
+      "de": "Nur wenn ein Dokument Text in einer Schrift enthält, die die eigenen Schriftarten dieser App nicht zeichnen (Arabisch, Hebräisch, Devanagari, Thai, Chinesisch, Japanisch, Koreanisch…): um die eine Noto-Schrift, die diese Schrift braucht, einmal von Google Fonts herunterzuladen und aufzubewahren. Jede Datei ist durch ihren SHA-256-Hashwert festgelegt, und filex lehnt alle anderen Bytes ab; gesendet wird nur die Adresse der Datei. Ohne diese Berechtigung wird solcher Text nicht gedruckt, und die Bildschirme sagen das, bevor jemand unterschreibt.",
+      "fr": "Uniquement quand un document contient du texte dans une écriture que les polices propres à cette application ne dessinent pas (arabe, hébreu, devanagari, thaï, chinois, japonais, coréen…) : pour télécharger une fois depuis Google Fonts la seule police Noto dont cette écriture a besoin, et la conserver. Chaque fichier est épinglé par son empreinte SHA-256 et filex refuse tout autre contenu ; rien n’est envoyé hormis l’adresse du fichier. Sans cela, ce texte n’est pas imprimé, et les écrans le signalent avant que quiconque signe."
+    },
+    "schedule": {
+      "en": "To close a request the moment its deadline passes, or its signing link is ended on the Shares screen, and to send the reminders you asked for — without waiting for somebody to open the document: filex wakes this app once an hour (and at once when one of its links is ended) and runs that work at the minute it falls due.",
+      "tr": "Bir isteği süresi dolduğu anda ya da imza bağlantısı Paylaşımlar ekranında sonlandırıldığında kapatmak ve istediğiniz hatırlatmaları göndermek için — birinin belgeyi açmasını beklemeden: filex bu uygulamayı saatte bir (ve bağlantılarından biri sonlandırılınca hemen) uyandırır ve işi, zamanı geldiği dakikada çalıştırır.",
+      "es": "Para cerrar una solicitud en cuanto vence su fecha límite, o cuando su enlace de firma se finaliza en la pantalla Enlaces compartidos, y para enviar los recordatorios que pidió, sin esperar a que alguien abra el documento: filex despierta esta aplicación una vez por hora (y enseguida cuando se finaliza uno de sus enlaces) y hace ese trabajo en el minuto en que corresponde.",
+      "de": "Um eine Anfrage zu schließen, sobald ihre Frist abläuft oder ihr Unterschriftslink im Bildschirm „Freigaben“ beendet wird, und um die gewünschten Erinnerungen zu senden – ohne zu warten, bis jemand das Dokument öffnet: filex weckt diese App einmal pro Stunde (und sofort, wenn einer ihrer Links beendet wird) und erledigt diese Arbeit in der Minute, in der sie fällig ist.",
+      "fr": "Pour clore une demande dès que sa date limite est passée, ou que son lien de signature a pris fin dans l’écran « Partages », et pour envoyer les rappels demandés — sans attendre que quelqu’un ouvre le document : filex réveille cette application une fois par heure (et aussitôt quand l’un de ses liens prend fin) et exécute ce travail à la minute où il est dû."
+    }
+  },
+  "settings": [
+    {
+      "key": "tsa_enabled",
+      "type": "bool",
+      "label": {
+        "en": "Add a time stamp to every signature",
+        "tr": "Her imzaya zaman damgası ekle",
+        "es": "Agregar un sello de tiempo a cada firma",
+        "de": "Jeder Unterschrift einen Zeitstempel hinzufügen",
+        "fr": "Ajouter un horodatage à chaque signature"
+      },
+      "help": {
+        "en": "Off by default. Without a stamp the signing time is the signer's own claim, and the verification report says so. With it, an RFC 3161 authority dates the signature. The request carries only the signature's digest and a nonce; the document never leaves this installation. If the authority cannot be reached the signature is still made, without a stamp.",
+        "tr": "Varsayılan olarak kapalı. Damga yoksa imza zamanı imzacının kendi beyanıdır ve doğrulama raporu bunu söyler. Açıkken bir RFC 3161 makamı imzayı tarihler. İstek yalnızca imzanın özetini ve rastgele bir sayı taşır; belge bu kurulumdan hiç çıkmaz. Makama ulaşılamazsa imza yine atılır, damgasız.",
+        "es": "Desactivado de forma predeterminada. Sin sello, la hora de la firma es lo que afirma el propio firmante, y el informe de verificación lo indica. Con él, una autoridad RFC 3161 fecha la firma. La solicitud lleva solo el resumen de la firma y un nonce; el documento nunca sale de esta instalación. Si no se puede contactar a la autoridad, la firma se hace igualmente, sin sello.",
+        "de": "Standardmäßig aus. Ohne Zeitstempel ist die Zeit der Unterschrift nur die Angabe des Unterzeichners, und der Prüfbericht sagt das. Mit ihm datiert ein RFC-3161-Dienst die Unterschrift. Die Anfrage enthält nur den Hashwert der Unterschrift und eine Nonce; das Dokument verlässt diese Installation nie. Ist der Dienst nicht erreichbar, wird die Unterschrift trotzdem geleistet, ohne Zeitstempel.",
+        "fr": "Désactivé par défaut. Sans horodatage, l’heure de la signature n’est que la déclaration du signataire, et le rapport de vérification le dit. Avec, une autorité RFC 3161 date la signature. La requête ne contient que l’empreinte de la signature et un nonce ; le document ne quitte jamais cette installation. Si l’autorité est injoignable, la signature est quand même faite, sans horodatage."
+      },
+      "default": false
+    },
+    {
+      "key": "tsa_url",
+      "type": "string",
+      "label": {
+        "en": "Time-stamping authority",
+        "tr": "Zaman damgası makamı",
+        "es": "Autoridad de sellado de tiempo",
+        "de": "Zeitstempeldienst",
+        "fr": "Autorité d’horodatage"
+      },
+      "help": {
+        "en": "The RFC 3161 endpoint. Empty uses https://freetsa.org/tsr, which is the host this app asks permission for; another host needs its own http: grant.",
+        "tr": "RFC 3161 adresi. Boş bırakılırsa bu uygulamanın izin istediği https://freetsa.org/tsr kullanılır; başka bir adres kendi http: iznini ister.",
+        "es": "El endpoint RFC 3161. Si se deja vacío, se usa https://freetsa.org/tsr, que es el host para el que esta aplicación pide permiso; otro host necesita su propio permiso http:.",
+        "de": "Der RFC-3161-Endpunkt. Leer bedeutet https://freetsa.org/tsr – der Host, für den diese App eine Berechtigung anfordert; ein anderer Host braucht seine eigene http:-Berechtigung.",
+        "fr": "L’endpoint RFC 3161. Vide, https://freetsa.org/tsr est utilisé — l’hôte pour lequel cette application demande l’autorisation ; un autre hôte nécessite sa propre autorisation http:."
+      },
+      "placeholder": "https://freetsa.org/tsr",
+      "show_when": {
+        "key": "tsa_enabled",
+        "equals": [
+          "true"
+        ]
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "sign",
+      "label": {
+        "en": "Sign…",
+        "tr": "İmzala…",
+        "es": "Firmar…",
+        "de": "Unterschreiben…",
+        "fr": "Signer…"
+      },
+      "icon": "sign",
+      "applies": {
+        "kind": "file",
+        "ext": [
+          "pdf"
+        ],
+        "engine_ext": {
+          "libreoffice": [
+            "odt",
+            "ott",
+            "ods",
+            "odp",
+            "odg",
+            "fodt",
+            "rtf",
+            "doc",
+            "docx",
+            "dot",
+            "dotx",
+            "xls",
+            "xlsx",
+            "ppt",
+            "pptx",
+            "txt"
+          ]
+        },
+        "no_state": [
+          "pending"
+        ]
+      },
+      "view": "sign-self",
+      "min_role": "editor",
+      "output": {
+        "mode": "sibling",
+        "name": "{stem}-signed{ext}"
+      },
+      "limits": {
+        "timeout_s": 600
+      }
+    },
+    {
+      "id": "request",
+      "label": {
+        "en": "Request signatures…",
+        "tr": "İmza iste…",
+        "es": "Solicitar firmas…",
+        "de": "Unterschriften anfordern…",
+        "fr": "Demander des signatures…"
+      },
+      "icon": "sign",
+      "applies": {
+        "kind": "file",
+        "ext": [
+          "pdf"
+        ],
+        "engine_ext": {
+          "libreoffice": [
+            "odt",
+            "ott",
+            "ods",
+            "odp",
+            "odg",
+            "fodt",
+            "rtf",
+            "doc",
+            "docx",
+            "dot",
+            "dotx",
+            "xls",
+            "xlsx",
+            "ppt",
+            "pptx",
+            "txt"
+          ]
+        },
+        "no_state": [
+          "pending"
+        ],
+        "writable": true
+      },
+      "view": "request",
+      "min_role": "editor",
+      "output": {
+        "mode": "none"
+      },
+      "limits": {
+        "timeout_s": 600
+      }
+    },
+    {
+      "id": "fill",
+      "label": {
+        "en": "Sign / Fill",
+        "tr": "İmzala / Doldur",
+        "es": "Firmar / Completar",
+        "de": "Unterschreiben / Ausfüllen",
+        "fr": "Signer / Remplir"
+      },
+      "icon": "sign",
+      "applies": {
+        "kind": "file",
+        "ext": [
+          "pdf"
+        ],
+        "state": [
+          "todo@me"
+        ]
+      },
+      "view": "sign-fill",
+      "min_role": "editor",
+      "output": {
+        "mode": "version"
+      },
+      "limits": {
+        "timeout_s": 600
+      }
+    },
+    {
+      "id": "verify",
+      "label": {
+        "en": "Verify",
+        "tr": "Doğrula",
+        "es": "Verificar",
+        "de": "Prüfen",
+        "fr": "Vérifier"
+      },
+      "icon": "sign",
+      "applies": {
+        "kind": "file",
+        "ext": [
+          "pdf"
+        ]
+      },
+      "view": "verify",
+      "min_role": "viewer",
+      "output": {
+        "mode": "none"
+      },
+      "limits": {
+        "timeout_s": 120
+      }
+    },
+    {
+      "id": "apply",
+      "label": {
+        "en": "Apply a signer's submission",
+        "tr": "İmzacının gönderimini uygula",
+        "es": "Aplicar el envío de un firmante",
+        "de": "Übermittlung eines Unterzeichners anwenden",
+        "fr": "Appliquer l’envoi d’un signataire"
+      },
+      "icon": "sign",
+      "applies": {
+        "kind": "file",
+        "ext": [
+          "pdf"
+        ]
+      },
+      "hidden": true,
+      "min_role": "editor",
+      "output": {
+        "mode": "version"
+      },
+      "limits": {
+        "timeout_s": 600
+      }
+    }
+  ],
+  "views": [
+    {
+      "id": "sign-self",
+      "placement": "page",
+      "label": {
+        "en": "Sign",
+        "tr": "İmzala",
+        "es": "Firmar",
+        "de": "Unterschreiben",
+        "fr": "Signer"
+      },
+      "size": "xl"
+    },
+    {
+      "id": "request",
+      "placement": "page",
+      "label": {
+        "en": "Request signatures",
+        "tr": "İmza iste",
+        "es": "Solicitar firmas",
+        "de": "Unterschriften anfordern",
+        "fr": "Demander des signatures"
+      },
+      "size": "xl"
+    },
+    {
+      "id": "sign-fill",
+      "placement": "page",
+      "label": {
+        "en": "Sign / Fill",
+        "tr": "İmzala / Doldur",
+        "es": "Firmar / Completar",
+        "de": "Unterschreiben / Ausfüllen",
+        "fr": "Signer / Remplir"
+      },
+      "size": "xl"
+    },
+    {
+      "id": "verify",
+      "placement": "page",
+      "label": {
+        "en": "Verify",
+        "tr": "Doğrula",
+        "es": "Verificar",
+        "de": "Prüfen",
+        "fr": "Vérifier"
+      },
+      "size": "lg"
+    },
+    {
+      "id": "status",
+      "placement": "inspector",
+      "label": {
+        "en": "Signatures",
+        "tr": "İmzalar",
+        "es": "Firmas",
+        "de": "Unterschriften",
+        "fr": "Signatures"
+      },
+      "applies": {
+        "kind": "file",
+        "ext": [
+          "pdf"
+        ]
+      }
+    },
+    {
+      "id": "envelopes",
+      "placement": "home",
+      "label": {
+        "en": "Signatures",
+        "tr": "İmzalar",
+        "es": "Firmas",
+        "de": "Unterschriften",
+        "fr": "Signatures"
+      }
+    }
+  ],
+  "public_pages": [
+    {
+      "id": "signer",
+      "label": {
+        "en": "Sign the document",
+        "tr": "Belgeyi imzala",
+        "es": "Firmar el documento",
+        "de": "Dokument unterschreiben",
+        "fr": "Signer le document"
+      },
+      "pin": "optional",
+      "default_ttl_days": 14,
+      "max_ttl_days": 90,
+      "purpose": {
+        "label": {
+          "en": "Signing request",
+          "tr": "İmza isteği",
+          "es": "Solicitud de firma",
+          "de": "Unterschriftsanfrage",
+          "fr": "Demande de signature"
+        },
+        "revoke": {
+          "en": "Revoking this link cancels the whole signing request: the other signers’ links stop too, the document is released, and everybody is told.",
+          "tr": "Bu bağlantıyı iptal etmek imza isteğinin tamamını iptal eder: diğer imzacıların bağlantıları da durur, belgenin kilidi kalkar ve herkese haber verilir.",
+          "es": "Revocar este enlace cancela toda la solicitud de firma: los enlaces de los demás firmantes también dejan de funcionar, el documento queda liberado y se avisa a todos.",
+          "de": "Wenn Sie diesen Link widerrufen, wird die gesamte Unterschriftsanfrage abgebrochen: Auch die Links der anderen Unterzeichner funktionieren nicht mehr, das Dokument wird freigegeben, und alle werden benachrichtigt.",
+          "fr": "Révoquer ce lien annule toute la demande de signature : les liens des autres signataires cessent aussi de fonctionner, le document est libéré, et tout le monde est prévenu."
+        },
+        "section": "requested"
+      }
+    },
+    {
+      "id": "receipt",
+      "label": {
+        "en": "Your signature receipt",
+        "tr": "İmza makbuzunuz",
+        "es": "Su recibo de firma",
+        "de": "Ihr Unterschriftsbeleg",
+        "fr": "Votre reçu de signature"
+      },
+      "pin": "optional",
+      "default_ttl_days": 30,
+      "max_ttl_days": 90,
+      "purpose": {
+        "label": {
+          "en": "Signature receipt",
+          "tr": "İmza makbuzu",
+          "es": "Recibo de firma",
+          "de": "Unterschriftsbeleg",
+          "fr": "Reçu de signature"
+        },
+        "revoke": {
+          "en": "Revoking this link takes the receipt page away from the signer it was sent to. Their signature stays valid.",
+          "tr": "Bu bağlantıyı iptal etmek, makbuz sayfasını gönderildiği imzacıdan geri alır. İmzası geçerli kalır.",
+          "es": "Revocar este enlace le quita la página del recibo al firmante a quien se envió. Su firma sigue siendo válida.",
+          "de": "Wenn Sie diesen Link widerrufen, verliert der Unterzeichner, dem er geschickt wurde, die Belegseite. Seine Unterschrift bleibt gültig.",
+          "fr": "Révoquer ce lien retire la page du reçu au signataire à qui elle a été envoyée. Sa signature reste valide."
+        },
+        "section": "requested"
+      }
+    }
+  ],
+  "limits": {
+    "memory_pages": 2048,
+    "call_timeout_s": 30
+  },
+  "messages": {
+    "lock.collecting": {
+      "en": "signatures are being collected",
+      "tr": "imzalar toplanıyor",
+      "es": "se están recogiendo las firmas",
+      "de": "Unterschriften werden gesammelt",
+      "fr": "les signatures sont en cours de collecte"
+    },
+    "lock.sealed": {
+      "en": "signed by everybody and sealed by filex",
+      "tr": "herkes imzaladı ve filex mühürledi",
+      "es": "firmado por todos y sellado por filex",
+      "de": "von allen unterschrieben und von filex versiegelt",
+      "fr": "signé par tous et scellé par filex"
+    }
+  },
+  "wasm": {
+    "url": "https://github.com/BRF-Tech/filex-sign/releases/download/{tag}/plugin.wasm",
+    "sha256": "a52ecb1833eed30e8f5cbbfd9cbf68e4c71c803b97f9f34186dc947feb243842"
+  }
+}

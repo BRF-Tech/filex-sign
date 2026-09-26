@@ -287,6 +287,12 @@ func FieldForm(l Lang, all, fs []envelope.Field, held map[string]string) []wire.
 			continue
 		}
 		fld, val := typedField(l, f, name, held[f.ID])
+		if f.Label == "" {
+			// A box nobody named is shown under OUR name for its kind — a
+			// translation, so it travels in every language (fieldIn).
+			f := f
+			fld = fieldIn(fld, Each(func(l Lang) string { return NameIn(l, all, f) }))
+		}
 		typed = append(typed, fld)
 		if val != nil {
 			values[f.ID] = val
@@ -470,8 +476,8 @@ func Decline(l Lang, env *envelope.Envelope, sg *envelope.Signer, errs map[strin
 				"%s kişisine iletilir, istek herkes için kapanır ve sonrasında “%s” belgesini kimse imzalayamaz.",
 				env.Requester.Display(), env.Document)),
 			form([]wire.Field{
-				withHint(longField(l, "decline_reason", "Reason (optional)", "Gerekçe (isteğe bağlı)"),
-					l.S("The amount is wrong.", "Tutar yanlış.")),
+				withHintIn(longField(l, "decline_reason", "Reason (optional)", "Gerekçe (isteğe bağlı)"),
+					l, "The amount is wrong.", "Tutar yanlış."),
 			}, nil),
 		},
 		Actions: []wire.SurfaceAction{
@@ -490,7 +496,7 @@ func closedWords(env *envelope.Envelope, sg *envelope.Signer) wire.Text {
 	case sg.Status == envelope.SignerDeclined:
 		return T("You refused to sign this document.", "Bu belgeyi imzalamayı reddettiniz.")
 	case env.Status == envelope.StatusCancelled:
-		return T("This signature request was cancelled by the requester.", "Bu imza isteği istekçi tarafından iptal edildi.")
+		return T("This signature request was cancelled by the requester.", "Bu imza isteği, isteği gönderen kişi tarafından iptal edildi.")
 	case env.Status == envelope.StatusExpired:
 		return T("This signature request has expired.", "Bu imza isteğinin süresi doldu.")
 	case env.Status == envelope.StatusDeclined:
@@ -508,7 +514,7 @@ func NotASigner(l Lang, env *envelope.Envelope, canManage bool) *wire.Surface {
 		"“%s” belgesi %s kişisini bekliyor. Siz imzacılarından biri değilsiniz.", env.Document, signerNames(env)))}
 	if canManage {
 		s.Nodes = append(s.Nodes, muted(T("You sent this request: open the file's details panel → Signatures to follow, remind or cancel it.",
-			"Bu isteği siz gönderdiniz: takip etmek, hatırlatmak ya da iptal etmek için dosyanın ayrıntı panelinde İmzalar bölümünü açın.")))
+			"Bu isteği siz gönderdiniz: takip etmek, hatırlatmak ya da iptal etmek için dosyanın Ayrıntılar panelinde İmzalar bölümünü açın.")))
 	}
 	return s
 }

@@ -122,14 +122,23 @@ type dateArg interface{ inLang(l Lang) string }
 func (l Lang) dated(args []any) []any {
 	var out []any
 	for i, a := range args {
-		d, ok := a.(dateArg)
-		if !ok {
+		var said string
+		switch x := a.(type) {
+		case dateArg:
+			said = x.inLang(l)
+		case wire.Text:
+			// Words already in every language (a reason, an error named
+			// for a person): each language takes its own. Spliced in as
+			// one string they were the CALL's language in all five — an
+			// English reason inside a Turkish sentence (2026-09-26).
+			said = In(x, l)
+		default:
 			continue
 		}
 		if out == nil {
 			out = append([]any(nil), args...)
 		}
-		out[i] = d.inLang(l)
+		out[i] = said
 	}
 	if out == nil {
 		return args

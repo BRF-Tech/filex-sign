@@ -6,7 +6,54 @@ All notable changes to filex-sign are listed here. The format follows
 
 ## [Unreleased]
 
-## [0.1.0] — first public release (not tagged yet)
+## [0.1.1] — 2026-09-26
+
+Proposed as **0.1.1** (a patch: fixes, one hidden action, no new permission,
+still filex ≥ 0.43.0).
+
+### Fixed
+- **"Convert to PDF" did nothing.** Asking for a signature on a DOCX (or any
+  office document) showed "Convert to PDF", and clicking it redrew the same
+  screen: the button is the screen's primary one, filex posts a primary button
+  as `submit`, and the app listened for `action` only. It now queues the
+  conversion — in the full page, the dialog and an embedded explorer's popup —
+  and the PDF lands beside the original. The same mistake had killed "Open its
+  Signatures panel" (a second request on an open document) and "Close the
+  expired request" (the Signatures panel); both work now. Every handler asks
+  for the button, not the event (`pressed`), and a test presses every footer
+  button the way filex's renderer does (the old test sent `action` for a
+  primary button, which filex never does, and stayed green).
+- **Parts of the app were English on a Turkish screen.**
+  - A form field's label, help and placeholder, and a select's options, were
+    one string in the language filex TOLD the app — the account's, which an
+    embedded explorer drawing Turkish over an English account got wrong
+    ("Identity", "One signer per line…"). Every field text now travels in
+    every language and the screen picks its own, on any filex ≥ 0.43.0. (filex
+    itself also starts telling apps the screen's language — see its
+    changelog.)
+  - English spliced into Turkish sentences: the certificate's uses on every
+    Verify card ("document signing, e-mail protection · digital signature,
+    non-repudiation"), the host's reason signing is off ("FILEX_SECRET_KEY is
+    not set"), a host error code ("rate_limited", "unavailable"), and
+    LibreOffice's or the PDF reader's own error text ("libreoffice produced no
+    PDF (exit 1)", "verify: not a PDF file"). Each is now said in words, in
+    every language; the raw text goes to the app's log. The Verify screen no
+    longer says "okunamadı" twice.
+  - The Turkish coverage line said the numbers the wrong way round ("5000
+    baytın ilki 8000 bayt" → "8000 baytın ilk 5000 baytı").
+  - Wording: "nonce", "istekçi", "ayrıntı paneli", "dosya yöneticisi",
+    "kıpırdamadı", "hareket etmiş", "demeti", "Verilen:" and lowercase
+    sentence starts replaced with filex's own words.
+  - `TestTurkish_*` (views and app) fail when a word of a screen's English
+    build appears in its Turkish build, when a field text is one string, and
+    on each of the job failures above.
+
+### Added
+- The hidden action `convert` (the second half of "Convert to PDF"), so the
+  operations tray says "Convert to PDF" / "PDF'e dönüştür" instead of "Sign…".
+  A `sign` job with `op=convert` from an older screen still converts.
+
+## [0.1.0] — 2026-09-24
 
 ⚠ The first version anybody can install. The app was built in three rounds
 before it was published, and those rounds carried the numbers 0.1.0–0.3.0
@@ -507,5 +554,6 @@ The MVP (M1) of the e-signature app for filex's app-plugin platform.
 - Host-side test harness (`internal/host.Fake` + throw-away CA) covering
   the whole flow without a wasm runtime.
 
-[Unreleased]: https://github.com/BRF-Tech/filex-sign/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/BRF-Tech/filex-sign/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/BRF-Tech/filex-sign/releases/tag/v0.1.1
 [0.1.0]: https://github.com/BRF-Tech/filex-sign/releases/tag/v0.1.0

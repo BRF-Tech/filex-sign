@@ -365,6 +365,18 @@ func TestManifestRules(t *testing.T) {
 			if !act.Hidden {
 				t.Error("apply is the second half of a flow, never a menu row")
 			}
+		case ActionConvert:
+			// The second half of "Convert to PDF": never a menu row, only an
+			// office document, a PDF written beside it.
+			if !act.Hidden {
+				t.Error("convert is queued by the office screen, never a menu row")
+			}
+			if !equal(act.Applies.Ext, OfficeExts) {
+				t.Errorf("convert applies to exactly the office documents: %v", act.Applies.Ext)
+			}
+			if act.Output.Mode != envelope.OutputSibling {
+				t.Errorf("the PDF goes beside the original: %+v", act.Output)
+			}
 		}
 	}
 	for _, v := range m.Views {
@@ -1530,12 +1542,10 @@ func TestOffice_ConvertsFirst(t *testing.T) {
 	if len(s.Actions) != 1 || s.Actions[0].ID != "convert" {
 		t.Fatalf("an office document offers one thing: %+v", s.Actions)
 	}
-	in = viewInput(ViewSignSelf, "action", "convert", s.State, nil)
+	// Pressed as filex presses it (buttons_test.go): the button is primary.
+	in = viewInput(ViewSignSelf, "", "", nil, nil)
 	in.Context.Inputs[0].Name = "teklif.docx"
-	s, err = a.viewSignSelf(in)
-	if err != nil {
-		t.Fatal(err)
-	}
+	s = press(t, s, "convert", in, a.viewSignSelf)
 	job := jobFrom(t, s, burak, "teklif.docx")
 	f.Inputs["in:0"] = []byte("PK\x03\x04 not a pdf")
 	out, err := a.actionSign(job)

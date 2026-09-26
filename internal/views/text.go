@@ -236,39 +236,95 @@ func nextButton() wire.SurfaceAction { return primary("next", T("Next", "İleri"
 // choice buttons — never a dropdown — so the options stay few enough to
 // read at a glance.
 
+// ⚠⚠ Every text a field shows travels in EVERY language (wire.Field.I18n,
+// wire.FieldOption.LabelI18n), beside the one string in the call's language.
+//
+// filex's renderer reads the map in the language ON SCREEN
+// (packages/core surfaceValues.storageFieldOf → labelOf); the string is only
+// the language the host TOLD the app. The two differ in an embedded explorer
+// drawing Turkish over an account whose language is English: the request
+// wizard's Turkish popup asked "Identity", with "One signer per line…" under
+// it (2026-09-26). With the map the screen's own language wins whatever the
+// host said; the string stays for a client that reads plain strings.
+func fieldIn(f wire.Field, label wire.Text) wire.Field {
+	if f.I18n == nil {
+		f.I18n = &wire.FieldI18n{}
+	} else {
+		copied := *f.I18n
+		f.I18n = &copied
+	}
+	f.I18n.Label = label
+	return f
+}
+
 func strField(l Lang, key, en, tr string) wire.Field {
-	return wire.Field{Key: key, Type: "string", Label: l.S(en, tr)}
+	return fieldIn(wire.Field{Key: key, Type: "string", Label: l.S(en, tr)}, T(en, tr))
 }
 
 func longField(l Lang, key, en, tr string) wire.Field {
-	return wire.Field{Key: key, Type: "text", Label: l.S(en, tr)}
+	return fieldIn(wire.Field{Key: key, Type: "text", Label: l.S(en, tr)}, T(en, tr))
 }
 
 func intField(l Lang, key, en, tr string, def, lo, hi int) wire.Field {
-	return wire.Field{Key: key, Type: "int", Label: l.S(en, tr), Default: def, Min: &lo, Max: &hi}
+	return fieldIn(wire.Field{Key: key, Type: "int", Label: l.S(en, tr), Default: def, Min: &lo, Max: &hi}, T(en, tr))
 }
 
 func boolField(l Lang, key, en, tr string, def bool) wire.Field {
-	return wire.Field{Key: key, Type: "bool", Label: l.S(en, tr), Default: def}
+	return fieldIn(wire.Field{Key: key, Type: "bool", Label: l.S(en, tr), Default: def}, T(en, tr))
 }
 
 func choice(l Lang, key, en, tr, def string, opts ...wire.FieldOption) wire.Field {
-	return wire.Field{Key: key, Type: "select", Label: l.S(en, tr), Options: opts, Default: def}
+	return fieldIn(wire.Field{Key: key, Type: "select", Label: l.S(en, tr), Options: opts, Default: def}, T(en, tr))
 }
 
 func opt(l Lang, value, en, tr string) wire.FieldOption {
-	return wire.FieldOption{Value: value, Label: l.S(en, tr)}
+	return wire.FieldOption{Value: value, Label: l.S(en, tr), LabelI18n: T(en, tr)}
+}
+
+// optIn is an option whose label is already words in every language.
+func optIn(l Lang, value string, label wire.Text) wire.FieldOption {
+	return wire.FieldOption{Value: value, Label: In(label, l), LabelI18n: label}
 }
 
 func withHelp(f wire.Field, l Lang, en, tr string) wire.Field {
 	f.Help = l.S(en, tr)
-	return f
+	return withHelpText(f, T(en, tr))
 }
 
 // withHelpf is withHelp for a sentence with values in it.
 func withHelpf(f wire.Field, l Lang, en, tr string, args ...any) wire.Field {
 	f.Help = l.Sf(en, tr, args...)
+	return withHelpText(f, Tf(en, tr, args...))
+}
+
+func withHelpText(f wire.Field, help wire.Text) wire.Field {
+	if f.I18n == nil {
+		f.I18n = &wire.FieldI18n{}
+	} else {
+		copied := *f.I18n
+		f.I18n = &copied
+	}
+	f.I18n.Help = help
 	return f
+}
+
+// withHintIn is a placeholder in every language (withHint: one that is
+// not ours to translate).
+func withHintIn(f wire.Field, l Lang, en, tr string) wire.Field {
+	f.Placeholder = l.S(en, tr)
+	if f.I18n == nil {
+		f.I18n = &wire.FieldI18n{}
+	} else {
+		copied := *f.I18n
+		f.I18n = &copied
+	}
+	f.I18n.Placeholder = T(en, tr)
+	return f
+}
+
+// labelledf is a field whose label is our sentence around somebody's name.
+func labelledf(l Lang, key, typ, en, tr string, args ...any) wire.Field {
+	return fieldIn(wire.Field{Key: key, Type: typ, Label: l.Sf(en, tr, args...)}, Tf(en, tr, args...))
 }
 
 // labelled is a field whose label is not ours to translate — the name a

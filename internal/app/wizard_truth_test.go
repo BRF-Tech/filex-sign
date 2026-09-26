@@ -322,14 +322,8 @@ func TestSecondRequest_WhileTheFirstIsOpenIsRefusedAtOnce(t *testing.T) {
 	if s.Job != nil || len(s.Actions) != 1 || s.Actions[0].ID != views.ActionOpenStatus {
 		t.Fatalf("the refusal offers exactly one way forward, the Signatures panel: %+v", s.Actions)
 	}
-	open, err := a.viewRequest(func() *wire.ViewEventInput {
-		in := requestIn("action", s.State, nil, ptr(7))
-		in.ActionID = views.ActionOpenStatus
-		return in
-	}())
-	if err != nil {
-		t.Fatal(err)
-	}
+	// Pressed as filex presses it (buttons_test.go): the button is primary.
+	open := press(t, s, views.ActionOpenStatus, requestIn("", nil, nil, ptr(7)), a.viewRequest)
 	if open.Open == nil || open.Open.View != ViewStatus || open.Open.Path != docPath {
 		t.Fatalf("the button does not go to the document's Signatures panel: %+v", open.Open)
 	}

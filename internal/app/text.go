@@ -88,10 +88,10 @@ func inviteMail(locale string, env *envelope.Envelope, sg *envelope.Signer) (sub
 	}
 	if signs {
 		b.WriteString(l.S("\nNo account is needed. Your signature is applied with a certificate issued in your name, for this one signing, by the signing authority of the requester's filex; a receipt reaches you the moment you are done.\n",
-			"\nHesap açmanız gerekmez. İmzanız, istekçinin filex kurulumundaki imza makamının bu tek işlem için adınıza ürettiği bir sertifikayla belgeye eklenir; imzanız biter bitmez size bir makbuz iletilir.\n"))
+			"\nHesap açmanız gerekmez. İmzanız, isteği gönderenin filex kurulumundaki imza makamının bu tek işlem için adınıza ürettiği bir sertifikayla belgeye eklenir; imzanız biter bitmez size bir makbuz iletilir.\n"))
 	} else {
 		b.WriteString(l.S("\nNo account is needed. Nothing of yours is drawn on the page, but what you fill in is sealed to your name with a certificate issued for this one submission by the signing authority of the requester's filex; a receipt reaches you the moment you are done.\n",
-			"\nHesap açmanız gerekmez. Sayfaya sizden bir şey çizilmez, ancak doldurduklarınız, istekçinin filex kurulumundaki imza makamının bu tek gönderim için adınıza ürettiği bir sertifikayla mühürlenir; işiniz biter bitmez size bir makbuz iletilir.\n"))
+			"\nHesap açmanız gerekmez. Sayfaya sizden bir şey çizilmez, ancak doldurduklarınız, isteği gönderenin filex kurulumundaki imza makamının bu tek gönderim için adınıza ürettiği bir sertifikayla mühürlenir; işiniz biter bitmez size bir makbuz iletilir.\n"))
 	}
 	return subject, b.String()
 }
@@ -376,11 +376,11 @@ func requesterNotice(env *envelope.Envelope, pins map[string]string) wire.Text {
 			}
 			if sg.Internal() {
 				b.WriteString(l.Sf("\n%s could not be notified (%s) — ask them to open the file and use “Sign / Fill”.",
-					"\n%s kişisine haber verilemedi (%s) — dosyayı açıp “İmzala / Doldur” demesini isteyin.", sg.Person.Identity(), sg.MailError))
+					"\n%s kişisine haber verilemedi (%s) — dosyayı açıp “İmzala / Doldur” demesini isteyin.", sg.Person.Identity(), views.ErrWords(sg.MailError)))
 				continue
 			}
 			b.WriteString(l.Sf("\nMail to %s could not be sent (%s) — pass the link on yourself: %s",
-				"\n%s adresine e-posta gönderilemedi (%s) — bağlantıyı kendiniz iletin: %s", sg.Person.Identity(), sg.MailError, sg.PageURL))
+				"\n%s adresine e-posta gönderilemedi (%s) — bağlantıyı kendiniz iletin: %s", sg.Person.Identity(), views.ErrWords(sg.MailError), sg.PageURL))
 		}
 		return b.String()
 	})

@@ -106,8 +106,8 @@ func SignSelf(l Lang, doc Doc, who envelope.Person, st SelfState, errs map[strin
 					"output_mode", envelope.OutputSibling), envelope.DefaultSiblingName),
 					l, "{stem} is the name without its extension, {ext} the extension.",
 					"{stem} uzantısız ad, {ext} uzantıdır."),
-				withHint(strField(l, "reason", "Reason (optional)", "Gerekçe (isteğe bağlı)"),
-					l.S("Approved", "Onaylandı")),
+				withHintIn(strField(l, "reason", "Reason (optional)", "Gerekçe (isteğe bağlı)"),
+					l, "Approved", "Onaylandı"),
 			}, map[string]any{"output_mode": out.Mode, "output_name": out.Name, "reason": st.Reason}),
 		)
 		// What goes under each signature, before Sign — as on a request.

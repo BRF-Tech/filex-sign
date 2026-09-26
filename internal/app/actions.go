@@ -40,6 +40,15 @@ var OfficeExts = []string{
 // this instance has none.
 var ErrNoOffice = errors.New("libreoffice is not installed on this filex")
 
+// convertError is LibreOffice running and not making a PDF: it failed, or
+// it ran out of time. detail is its own (English) words, for the log.
+type convertError struct {
+	detail  string
+	timeout bool
+}
+
+func (e *convertError) Error() string { return "libreoffice produced no PDF (" + e.detail + ")" }
+
 // document is the PDF a job works on.
 type document struct {
 	Bytes []byte
@@ -112,7 +121,17 @@ func (a *App) convert(ref, ext string) ([]byte, error) {
 		Inputs: map[string]string{inName: ref}, Outputs: []string{"in.pdf"}, TimeoutS: convertTimeoutS,
 	})
 	if err != nil {
-		return nil, err
+		var he *pluginkit.HostError
+		if errors.As(err, &he) {
+			switch he.Code {
+			case wire.ErrUnavailable:
+				// The engine went away between the screen and the job.
+				return nil, ErrNoOffice
+			case wire.ErrTimeout:
+				return nil, &convertError{detail: err.Error(), timeout: true}
+			}
+		}
+		return nil, &convertError{detail: err.Error()}
 	}
 	for _, o := range res.Outputs {
 		if o.Name == "in.pdf" {
@@ -126,12 +145,25 @@ func (a *App) convert(ref, ext string) ([]byte, error) {
 	if tail == "" {
 		tail = fmt.Sprintf("exit %d", res.Exit)
 	}
-	return nil, fmt.Errorf("libreoffice produced no PDF (%s)", clip(tail, 160))
+	return nil, &convertError{detail: clip(tail, 160)}
 }
 
 // intakeWords turns a refusal into words the person can act on.
-func intakeWords(err error, name string) wire.Text {
+//
+// ⚠ Never the error's own words: they are English, and they were spliced
+// into a Turkish sentence ("Belge okunamadı: libreoffice produced no PDF
+// (exit 1)"). The error itself goes to the app's log.
+func (a *App) intakeWords(err error, name string) wire.Text {
+	var ce *convertError
 	switch {
+	case errors.As(err, &ce):
+		a.logf("warn", "converting %s: %v", name, err)
+		if ce.timeout {
+			return views.Tf("LibreOffice took too long to turn “%s” into a PDF. Try again, or convert it to PDF yourself and sign that.",
+				"LibreOffice “%s” belgesini zamanında PDF'e çeviremedi. Yeniden deneyin ya da kendiniz PDF'e çevirip onu imzalayın.", name)
+		}
+		return views.Tf("LibreOffice could not turn “%s” into a PDF — it may be damaged or password-protected. Convert it to PDF yourself and sign that.",
+			"LibreOffice “%s” belgesini PDF'e çeviremedi — belge bozuk ya da parola korumalı olabilir. Kendiniz PDF'e çevirip onu imzalayın.", name)
 	case errors.Is(err, ErrNoOffice):
 		return views.Tf("This filex has no LibreOffice, so “%s” cannot be turned into a PDF to sign. Convert it to PDF first (the Convert app, or your office suite) and sign that.",
 			"Bu filex kurulumunda LibreOffice yok, bu yüzden “%s” imzalanmak üzere PDF'e çevrilemiyor. Önce PDF'e dönüştürün (Dönüştür uygulaması ya da ofis programınız) ve onu imzalayın.", name)
@@ -143,7 +175,9 @@ func intakeWords(err error, name string) wire.Text {
 		return views.Tf("“%s” is not a document this app can sign. Convert it to PDF first.",
 			"“%s” bu uygulamanın imzalayabileceği bir belge değil. Önce PDF'e dönüştürün.", name)
 	}
-	return views.Tf("The document could not be read: %s", "Belge okunamadı: %s", err.Error())
+	a.logf("warn", "reading %s: %v", name, err)
+	return views.Tf("“%s” could not be read — it may be damaged, or not a kind of document this app can read.",
+		"“%s” okunamadı — bozuk olabilir ya da bu uygulamanın okuyabildiği türden bir belge değil.", name)
 }
 
 // ── shared: one signature by one person ────────────────────────────────
@@ -779,13 +813,13 @@ func (a *App) actionSign(in *wire.ActionRunInput) (*wire.ActionRunOutput, error)
 		return a.opConvert(in)
 	}
 	if reason, ok := a.signingReady(); !ok {
-		return failf("Signing is not available: %s", "İmzalama kullanılamıyor: %s", reason)
+		return failf("Signing is not available: %s", "İmzalama kullanılamıyor: %s", views.SigningUnavailable(reason))
 	}
 	l := views.Of(in.Locale)
 	a.step(in.Locale, 1, 4, "reading the document", "belge okunuyor")
 	doc, err := a.openDocument(in.Locale, in.Inputs[0].Ref, in.Inputs[0].Name)
 	if err != nil {
-		return failText(intakeWords(err, in.Inputs[0].Name))
+		return failText(a.intakeWords(err, in.Inputs[0].Name))
 	}
 	flds, err := parseFields(in.Params["fields"], fontkit.DefaultID, l)
 	if err != nil {
@@ -854,6 +888,16 @@ func (a *App) actionSign(in *wire.ActionRunInput) (*wire.ActionRunOutput, error)
 	})}, nil
 }
 
+// actionConvert is the hidden action "Convert to PDF" queues. (A `sign`
+// job with op=convert, which a screen before 0.1.1 queued, still lands in
+// opConvert through actionSign.)
+func (a *App) actionConvert(in *wire.ActionRunInput) (*wire.ActionRunOutput, error) {
+	if len(in.Inputs) == 0 {
+		return fail("No document was given.", "Belge verilmedi.")
+	}
+	return a.opConvert(in)
+}
+
 // opConvert turns an office document into a PDF beside it and stops
 // there: with a PDF in the folder the boxes can be placed and the whole
 // request flow works.
@@ -861,7 +905,7 @@ func (a *App) opConvert(in *wire.ActionRunInput) (*wire.ActionRunOutput, error) 
 	a.step(in.Locale, 1, 2, "converting", "dönüştürülüyor")
 	doc, err := a.openDocument(in.Locale, in.Inputs[0].Ref, in.Inputs[0].Name)
 	if err != nil {
-		return failText(intakeWords(err, in.Inputs[0].Name))
+		return failText(a.intakeWords(err, in.Inputs[0].Name))
 	}
 	if !doc.Converted() {
 		return fail("This document already is a PDF.", "Bu belge zaten PDF.")
@@ -898,7 +942,7 @@ func (a *App) actionVerify(in *wire.ActionRunInput) (*wire.ActionRunOutput, erro
 	}
 	rep, err := a.report(in.Inputs[0].Ref)
 	if err != nil {
-		return failText(intakeWords(err, in.Inputs[0].Name))
+		return failText(a.intakeWords(err, in.Inputs[0].Name))
 	}
 	if !rep.Signed() {
 		return fail("This document carries no electronic signature.", "Bu belgede elektronik imza yok.")
@@ -919,11 +963,11 @@ func shortErr(err error) string {
 	if errors.As(err, &he) {
 		return he.Code
 	}
-	s := err.Error()
-	if len(s) > 80 {
-		s = s[:80]
-	}
-	return s
+	// ⚠ A code, never the error's own (English) words: this is spliced
+	// into a person's sentence through views.ErrWords, and stored on the
+	// envelope to be said later in the requester's language. The caller
+	// logs the error itself.
+	return "internal"
 }
 
 func b64of(b []byte) string { return base64.StdEncoding.EncodeToString(b) }

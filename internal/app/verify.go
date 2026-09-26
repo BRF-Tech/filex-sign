@@ -1,11 +1,13 @@
 package app
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/brf-tech/filex/backend/pkg/pluginkit/wire"
 
 	"github.com/brf-tech/filex-sign/internal/envelope"
+	"github.com/brf-tech/filex-sign/internal/pdfsig"
 	"github.com/brf-tech/filex-sign/internal/verify"
 	"github.com/brf-tech/filex-sign/internal/views"
 )
@@ -35,7 +37,7 @@ func (a *App) viewVerify(in *wire.ViewEventInput) (*wire.Surface, error) {
 	}
 	rep, err := a.report(docRef)
 	if err != nil {
-		out.Err = views.In(intakeWords(err, doc.Name), l)
+		out.Err = views.In(a.readWhy(err), l)
 		return views.Verify(l, out), nil
 	}
 	out.Report = rep
@@ -79,4 +81,22 @@ func (a *App) countSignatures(in *wire.ViewEventInput) int {
 		return 0
 	}
 	return len(rep.Signatures)
+}
+
+// readWhy is why a document could not be checked, as the second half of
+// the Verify screen's "This document could not be read: …". It used to be
+// intakeWords — a whole sentence of its own — behind that prefix, and for an
+// unknown error the error's English words: "Bu belge okunamadı: Belge
+// okunamadı: verify: malformed PDF" (2026-09-26). The error goes to the log.
+func (a *App) readWhy(err error) wire.Text {
+	switch {
+	case errors.Is(err, pdfsig.ErrEncrypted):
+		return views.T("it is password-protected", "parola korumalı")
+	case errors.Is(err, pdfsig.ErrXFA):
+		return views.T("it is an XFA form, which carries no signature this app can check", "bu uygulamanın denetleyebileceği imzayı taşımayan bir XFA formu")
+	case errors.Is(err, pdfsig.ErrNotPDF):
+		return views.T("it is not a PDF", "PDF değil")
+	}
+	a.logf("warn", "verify: %v", err)
+	return views.T("it may be damaged, or a kind of PDF this app cannot read", "bozuk olabilir ya da bu uygulamanın okuyamadığı türde bir PDF")
 }

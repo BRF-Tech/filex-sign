@@ -2,6 +2,7 @@ package views
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/brf-tech/filex/backend/pkg/pluginkit/wire"
@@ -237,7 +238,7 @@ func Home(l Lang, in HomeInput) *wire.Surface {
 
 	if !in.CAOK {
 		s.Nodes = append(s.Nodes, danger(Tf("Signing is not available on this installation: %s",
-			"Bu kurulumda imzalama kullanılamıyor: %s", in.CAReason)))
+			"Bu kurulumda imzalama kullanılamıyor: %s", SigningUnavailable(in.CAReason))))
 	}
 	switch sec {
 	case SectionToSign:
@@ -264,7 +265,7 @@ func Home(l Lang, in HomeInput) *wire.Surface {
 	}
 	if in.Truncated && sec != SectionAbout {
 		s.Nodes = append(s.Nodes, muted(T("There is more than this screen shows. The explorer filters and searches; this is a list, not a search.",
-			"Bu ekranın gösterdiğinden fazlası var. Süzmek ve aramak için dosya yöneticisini kullanın; burası bir liste, arama değil.")))
+			"Bu ekranın gösterdiğinden fazlası var. Süzmek ve aramak için dosya gezginini kullanın; burası bir liste, arama değil.")))
 	}
 	return s
 }
@@ -278,7 +279,7 @@ func homeAbout(l Lang, in HomeInput) []wire.Node {
 		text(T("Boxes have names. Whoever places them names each one, and the signer fills a plain form of those names before seeing the finished document and approving it.",
 			"Kutuların adı vardır. Yerleştiren kişi her birine bir ad verir; imzacı da önce o adlardan oluşan sade bir formu doldurur, sonra belgenin son hâlini görüp onaylar.")),
 		text(T("A signer does not need an e-mail address. An identity is a name, an address, or both; somebody with no address gets a link and a PIN that are shown to the requester, who hands them over.",
-			"İmzacının e-posta adresi olmak zorunda değil. Kimlik: ad, adres ya da ikisi; adresi olmayana da bağlantı ve PIN üretilir, bunlar istekçiye gösterilir, o elden iletir.")),
+			"İmzacının e-posta adresi olmak zorunda değil. Kimlik: ad, adres ya da ikisi; adresi olmayana da bağlantı ve PIN üretilir, bunlar isteği gönderene gösterilir, o elden iletir.")),
 		text(Expectation(l)),
 	}
 	if in.CAFP != "" {
@@ -514,3 +515,48 @@ func orDash(s string) string {
 
 // Dates for people are written through i18n's Day / When / Span (the SDK's
 // humandate — filex's own format), never as an ISO day.
+
+// SigningUnavailable is why this installation cannot sign, in words a
+// reader can act on.
+//
+// ⚠ The host's reason is English and technical ("FILEX_SECRET_KEY is not
+// set"), and it used to be spliced as it is into the reader's sentence:
+// "Bu kurulumda imzalama kullanılamıyor: FILEX_SECRET_KEY is not set"
+// (2026-09-26). The app keeps the host's own words in its log.
+func SigningUnavailable(reason string) wire.Text {
+	switch r := strings.ToLower(reason); {
+	case strings.Contains(r, "filex_secret_key"):
+		return T("the server has no FILEX_SECRET_KEY, which signing needs — an administrator sets it and restarts filex",
+			"sunucuda imzalamanın gerektirdiği FILEX_SECRET_KEY ayarlı değil — bir yönetici ayarlayıp filex'i yeniden başlatmalı")
+	case strings.Contains(r, "permission"):
+		return T("this app was not granted signing — an administrator reviews its permissions",
+			"bu uygulamaya imzalama izni verilmemiş — bir yönetici izinlerini gözden geçirmeli")
+	case r == "" || strings.Contains(r, "not enabled"):
+		return T("an administrator has not enabled signing", "bir yönetici imzalamayı henüz etkinleştirmedi")
+	}
+	return T("the server could not provide a signing authority — the reason is in the app's log",
+		"sunucu bir imza makamı sağlayamadı — sebebi uygulamanın günlüğünde")
+}
+
+// ErrWords names a host error code (pluginkit.HostError.Code) for a person.
+// The code alone — "rate_limited", "permission_denied" — was printed inside
+// a Turkish sentence (2026-09-26).
+func ErrWords(code string) wire.Text {
+	switch code {
+	case "permission_denied":
+		return T("permission denied", "izin verilmedi")
+	case "not_found":
+		return T("not found", "bulunamadı")
+	case "too_large":
+		return T("too large", "çok büyük")
+	case "timeout":
+		return T("it took too long", "zaman aşımına uğradı")
+	case "unavailable":
+		return T("the service is not available here — mail may not be set up", "hizmet burada kullanılamıyor — e-posta ayarlanmamış olabilir")
+	case "busy", "rate_limited":
+		return T("too many attempts — try again later", "çok sık denendi — biraz sonra yeniden deneyin")
+	case "invalid":
+		return T("the request was refused as invalid", "istek geçersiz sayılıp reddedildi")
+	}
+	return T("an unexpected error — the details are in the app's log", "beklenmeyen bir hata — ayrıntı uygulamanın günlüğünde")
+}

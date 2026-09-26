@@ -1,7 +1,7 @@
 {
   "manifest_version": 1,
   "name": "sign",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "label": {
     "en": "e-Signature",
     "tr": "e-İmza",
@@ -101,7 +101,7 @@
     },
     "notify:send": {
       "en": "To ask a signer of this installation to sign, to hand them their receipt, and to tell the requester when somebody views, signs, refuses or when everything is done.",
-      "tr": "Bu kurulumdaki bir imzacıdan imza istemek, makbuzunu vermek ve birisi görüntülediğinde, imzaladığında, reddettiğinde ya da her şey bittiğinde istekçiye haber vermek için.",
+      "tr": "Bu kurulumdaki bir imzacıdan imza istemek, makbuzunu vermek ve birisi görüntülediğinde, imzaladığında, reddettiğinde ya da her şey bittiğinde isteği gönderene haber vermek için.",
       "es": "Para pedir a un firmante de esta instalación que firme, entregarle su recibo y avisar al solicitante cuando alguien lo ve, firma, rechaza o cuando todo terminó.",
       "de": "Um einen Unterzeichner dieser Installation um seine Unterschrift zu bitten, ihm seinen Beleg zu übergeben und die anfordernde Person zu benachrichtigen, wenn jemand ansieht, unterschreibt, ablehnt oder wenn alles erledigt ist.",
       "fr": "Pour demander à un signataire de cette installation de signer, lui remettre son reçu, et prévenir le demandeur quand quelqu’un consulte, signe, refuse, ou quand tout est terminé."
@@ -122,7 +122,7 @@
     },
     "http:freetsa.org": {
       "en": "Only when the administrator switches time stamping on: to ask a time-stamping authority to date a signature. The request carries the signature's digest and a nonce — never the document.",
-      "tr": "Yalnız yönetici zaman damgasını açtığında: bir zaman damgası makamından imzaya tarih atmasını istemek için. İstek imzanın özetini ve bir nonce taşır — belgeyi asla.",
+      "tr": "Yalnız yönetici zaman damgasını açtığında: bir zaman damgası makamından imzaya tarih atmasını istemek için. İstek imzanın özetini ve rastgele bir sayı taşır — belgeyi asla.",
       "es": "Solo cuando el administrador activa el sellado de tiempo: para pedir a una autoridad de sellado de tiempo que feche una firma. La solicitud lleva el resumen de la firma y un nonce, nunca el documento.",
       "de": "Nur wenn der Administrator Zeitstempel einschaltet: um einen Zeitstempeldienst zu bitten, eine Unterschrift zu datieren. Die Anfrage enthält den Hashwert der Unterschrift und eine Nonce – nie das Dokument.",
       "fr": "Uniquement si l’administrateur active l’horodatage : pour demander à une autorité d’horodatage de dater une signature. La requête contient l’empreinte de la signature et un nonce — jamais le document."
@@ -364,6 +364,50 @@
       "limits": {
         "timeout_s": 600
       }
+    },
+    {
+      "id": "convert",
+      "label": {
+        "en": "Convert to PDF",
+        "tr": "PDF'e dönüştür",
+        "es": "Convertir a PDF",
+        "de": "In PDF umwandeln",
+        "fr": "Convertir en PDF"
+      },
+      "icon": "sign",
+      "applies": {
+        "kind": "file",
+        "ext": [
+          "odt",
+          "ott",
+          "ods",
+          "odp",
+          "odg",
+          "fodt",
+          "rtf",
+          "doc",
+          "docx",
+          "dot",
+          "dotx",
+          "xls",
+          "xlsx",
+          "ppt",
+          "pptx",
+          "txt"
+        ],
+        "no_state": [
+          "pending"
+        ]
+      },
+      "hidden": true,
+      "min_role": "editor",
+      "output": {
+        "mode": "sibling",
+        "name": "{stem}.pdf"
+      },
+      "limits": {
+        "timeout_s": 300
+      }
     }
   ],
   "views": [
@@ -528,6 +572,6 @@
   },
   "wasm": {
     "url": "https://github.com/BRF-Tech/filex-sign/releases/download/{tag}/plugin.wasm",
-    "sha256": "a52ecb1833eed30e8f5cbbfd9cbf68e4c71c803b97f9f34186dc947feb243842"
+    "sha256": "e1e24963685022ff667fa8c3af06382220ba240f0e0b08c4b88281336aeb4971"
   }
 }

@@ -268,7 +268,7 @@ func (a *App) opRemind(ref string, env *envelope.Envelope, signerID string, sche
 	if scheduled && (env.Status.Closed() || sg.Done()) {
 		return &wire.ActionRunOutput{OK: true, Message: views.Tf(
 			"No reminder needed: %s has already acted.",
-			"%s zaten hareket etmiş; hatırlatmaya gerek kalmadı.", sg.Person.Identity())}, nil
+			"%s zaten yanıt vermiş; hatırlatmaya gerek kalmadı.", sg.Person.Identity())}, nil
 	}
 	if !sg.Internal() && !sg.Person.HasEmail() {
 		return failf("%s has no address for filex to write to — pass their link on yourself: %s",
@@ -284,12 +284,14 @@ func (a *App) opRemind(ref string, env *envelope.Envelope, signerID string, sche
 			Title: reminderTitle(title), Body: body, Severity: "info", ToUserID: sg.Person.UserID,
 			Target: &pluginkit.NoticeTarget{Ref: ref, Action: ActionFill},
 		}); err != nil {
-			return failf("The reminder could not be sent (%s).", "Hatırlatma gönderilemedi (%s).", shortErr(err))
+			a.logf("warn", "reminder: %v", err)
+			return failf("The reminder could not be sent (%s).", "Hatırlatma gönderilemedi (%s).", views.ErrWords(shortErr(err)))
 		}
 	} else {
 		subject, body := reminderMail(env.Options.Locale, env, sg)
 		if err := a.H.MailSend(sg.Person.Email, subject, body); err != nil {
-			return failf("Mail could not be sent (%s). Pass the link on yourself: %s", "E-posta gönderilemedi (%s). Bağlantıyı kendiniz iletin: %s", shortErr(err), sg.PageURL)
+			a.logf("warn", "reminder mail: %v", err)
+			return failf("Mail could not be sent (%s). Pass the link on yourself: %s", "E-posta gönderilemedi (%s). Bağlantıyı kendiniz iletin: %s", views.ErrWords(shortErr(err)), sg.PageURL)
 		}
 	}
 	if err := a.store(ref, &next); err != nil {
@@ -353,7 +355,7 @@ func (a *App) whoSigns(in *wire.ActionRunInput, env *envelope.Envelope) (*envelo
 
 func (a *App) opSign(in *wire.ActionRunInput, ref string, env *envelope.Envelope) (*wire.ActionRunOutput, error) {
 	if reason, ok := a.signingReady(); !ok {
-		return failf("Signing is not available: %s", "İmzalama kullanılamıyor: %s", reason)
+		return failf("Signing is not available: %s", "İmzalama kullanılamıyor: %s", views.SigningUnavailable(reason))
 	}
 	sg, bad := a.whoSigns(in, env)
 	if bad != nil {
@@ -373,7 +375,7 @@ func (a *App) opSign(in *wire.ActionRunInput, ref string, env *envelope.Envelope
 	a.step(in.Locale, 1, 5, "reading the document", "belge okunuyor")
 	doc, err := a.openDocument(in.Locale, ref, env.Document)
 	if err != nil {
-		return failText(intakeWords(err, env.Document))
+		return failText(a.intakeWords(err, env.Document))
 	}
 	values := parseFill(in.Params["values"])
 	drawing := decodeImage(str(in.Params, "png_b64"))
@@ -764,7 +766,7 @@ func (a *App) lockForGood(ref string, env *envelope.Envelope, out envelope.Outpu
 		title := views.T("The signed file could not be locked", "İmzalı dosya kilitlenemedi")
 		body := views.Tf("“%s” is signed by everybody and sealed, but the lock you asked for could not be taken (%s). The certification and the SHA-256 every party was sent still show any change.",
 			"“%s” herkesçe imzalandı ve mühürlendi, ancak istediğiniz kilit alınamadı (%s). Onay ve her tarafa gönderilen SHA-256 özeti her değişikliği yine gösterir.",
-			env.Document, shortErr(err))
+			env.Document, views.ErrWords(shortErr(err)))
 		a.notifyRequester(ref, env, title, body, "warning")
 		return
 	}

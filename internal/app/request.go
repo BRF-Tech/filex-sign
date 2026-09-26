@@ -20,7 +20,7 @@ import (
 // per outside signer, and the invitations.
 func (a *App) actionRequest(in *wire.ActionRunInput) (*wire.ActionRunOutput, error) {
 	if reason, ok := a.signingReady(); !ok {
-		return failf("Signing is not available: %s", "İmzalama kullanılamıyor: %s", reason)
+		return failf("Signing is not available: %s", "İmzalama kullanılamıyor: %s", views.SigningUnavailable(reason))
 	}
 	if len(in.Inputs) == 0 {
 		return fail("No document was given.", "Belge verilmedi.")
@@ -42,13 +42,13 @@ func (a *App) actionRequest(in *wire.ActionRunInput) (*wire.ActionRunOutput, err
 			// The wizard says this first (views.AlreadyRequested); this is
 			// the boundary for a job queued some other way.
 			return fail("This document already has an open signature request, and a document carries one at a time. Follow or cancel it in the details panel → Signatures, then ask again.",
-				"Bu belgenin zaten açık bir imza isteği var ve bir belge aynı anda tek istek taşır. İsteği ayrıntı paneli → İmzalar'dan izleyin ya da iptal edin, sonra yeniden isteyin.")
+				"Bu belgenin zaten açık bir imza isteği var ve bir belge aynı anda tek istek taşır. İsteği Ayrıntılar paneli → İmzalar'dan izleyin ya da iptal edin, sonra yeniden isteyin.")
 		}
 	}
 	a.step(in.Locale, 1, 5, "reading the document", "belge okunuyor")
 	doc, err := a.openDocument(in.Locale, ref, in.Inputs[0].Name)
 	if err != nil {
-		return failText(intakeWords(err, in.Inputs[0].Name))
+		return failText(a.intakeWords(err, in.Inputs[0].Name))
 	}
 	if doc.Converted() {
 		return failf("“%s” is not a PDF. Convert it first — “Sign…” offers that — and ask for signatures on the PDF, where the boxes can be placed.",
@@ -117,8 +117,9 @@ func (a *App) actionRequest(in *wire.ActionRunInput) (*wire.ActionRunOutput, err
 		// the requester's (v0.43.0 wave 2).
 		until, err := a.H.FileLockMessage(ref, ttl, LockCollecting, nil)
 		if err != nil {
+			a.logf("warn", "freezing the document: %v", err)
 			return failf("The document could not be frozen (%s). Start the request again without it, or free the file first.",
-				"Belge dondurulamadı (%s). İsteği dondurmadan yeniden başlatın ya da önce dosyayı serbest bırakın.", shortErr(err))
+				"Belge dondurulamadı (%s). İsteği dondurmadan yeniden başlatın ya da önce dosyayı serbest bırakın.", views.ErrWords(shortErr(err)))
 		}
 		env.Locked = true
 		env.LockUntil = envelope.Stamp(until)

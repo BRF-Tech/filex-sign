@@ -92,7 +92,7 @@ func Status(l Lang, in StatusInput) *wire.Surface {
 	signed, total := env.Progress()
 	s.Nodes = []wire.Node{
 		heading(Each(func(l Lang) string {
-			return l.Sf("%s · %d/%d done", "%s · %d/%d tamamladı", In(StatusWords(env.Status), l), signed, total)
+			return l.Sf("%s · %d/%d done", "%s · %d/%d tamamlandı", In(StatusWords(env.Status), l), signed, total)
 		})),
 		muted(Tf("Requested by %s on %s", "%s tarafından %s tarihinde istendi",
 			env.Requester.Identity(), Day(env.CreatedAt))),
@@ -126,7 +126,7 @@ func Status(l Lang, in StatusInput) *wire.Surface {
 		case sg.DeclinedAt != "":
 			cells["when"] = DayText(sg.DeclinedAt)
 		case sg.ViewedAt != "":
-			cells["when"] = Tf("opened %s", "%s açtı", Day(sg.ViewedAt))
+			cells["when"] = Tf("opened %s", "%s tarihinde açtı", Day(sg.ViewedAt))
 		case sg.PageExpires != "":
 			cells["when"] = Tf("until %s", "%s tarihine kadar", Day(sg.PageExpires))
 		}
@@ -159,12 +159,12 @@ func Status(l Lang, in StatusInput) *wire.Surface {
 
 	if in.RemindDue && !env.Status.Closed() {
 		s.Nodes = append(s.Nodes, info(Tf("Nobody has moved for %d days. “Remind” sends the invitation again.",
-			"%d gündür kimse kıpırdamadı. “Hatırlat” daveti yeniden gönderir.", env.Options.RemindEveryDays)))
+			"%d gündür kimse işlem yapmadı. “Hatırlat” daveti yeniden gönderir.", env.Options.RemindEveryDays)))
 	}
 	if in.ShowLinkFor != "" {
 		if sg := env.Signer(in.ShowLinkFor); sg != nil && sg.PageURL != "" {
 			s.Nodes = append(s.Nodes, form([]wire.Field{
-				withHelp(labelled("link", "string", l.Sf("Link for %s", "%s için bağlantı", sg.Person.Identity())), l,
+				withHelp(labelledf(l, "link", "string", "Link for %s", "%s için bağlantı", sg.Person.Identity()), l,
 					"Copy it and send it yourself. The PIN, if one was set, was shown when the request was sent (the job message and the bell) — it is never in a mail.",
 					"Kopyalayıp kendiniz iletin. PIN koyduysanız, istek gönderilirken gösterildi (iş mesajı ve bildirim) — e-postada asla olmaz."),
 			}, map[string]any{"link": sg.PageURL}))

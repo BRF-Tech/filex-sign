@@ -921,6 +921,22 @@ office extensions into the action's rule only then). LibreOffice runs as a host 
 
 Without LibreOffice the screen says so plainly instead of failing a job.
 
+"Convert to PDF" queues the hidden action `convert` (so the operations tray
+names the job "Convert to PDF", not "Sign…"); the PDF lands beside the
+original and the job's message says to open it and ask for signatures there.
+If LibreOffice fails, runs out of time or went away between the screen and the
+job, the job says which, in the reader's language; LibreOffice's own words go
+to the app's log.
+
+⚠⚠ The button is the screen's primary button, and filex posts a primary
+button as `submit` (every other one as `action`), with its id in `action_id`
+— in the full page, in the dialog and in an embedded explorer's popup alike.
+Every handler here asks for the BUTTON (`pressed(in, id)`), never for the
+event that carries it: until 0.1.1 "Convert to PDF", "Open its Signatures
+panel" and "Close the expired request" listened for `action` only, and a
+click redrew the same screen. `buttons_test.go` presses every footer button
+the way filex does.
+
 ⚠ A converted document can never become a *new version* of its original — the
 job refuses that combination rather than replacing a `.docx` with a PDF under
 the same name.

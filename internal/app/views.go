@@ -45,8 +45,23 @@ func withPath(s *wire.Surface, doc views.Doc) *wire.Surface {
 	return s
 }
 
+// pressed reports whether the event is a click on the footer button id.
+//
+// ⚠⚠ filex posts a footer button as `submit` when it is the screen's
+// primary button and as `action` otherwise, with the id in action_id
+// (packages/core usePluginSurface.press — one code path for the dialog,
+// the full page and an embedded explorer's popup). A handler that listens
+// for only one of the two is a dead button: "Convert to PDF", "Open its
+// Signatures panel" and "Close the expired request" were all primary and
+// all listened for `action` alone, so a click redrew the same screen and
+// nothing happened (2026-09-26, a DOCX sent for signature). Ask for the
+// button, never for the event that carries it.
+func pressed(in *wire.ViewEventInput, id string) bool {
+	return in != nil && in.ActionID == id && (in.Event == "action" || in.Event == "submit")
+}
+
 func convertJob() *wire.Surface {
-	return &wire.Surface{Job: &wire.JobRequest{ActionID: ActionSign, Params: map[string]any{"op": "convert"},
+	return &wire.Surface{Job: &wire.JobRequest{ActionID: ActionConvert, Params: map[string]any{"op": "convert"},
 		Output: &wire.Output{Mode: envelope.OutputSibling, Name: "{stem}.pdf"}}}
 }
 
@@ -60,7 +75,7 @@ func (a *App) viewSignSelf(in *wire.ViewEventInput) (*wire.Surface, error) {
 		return withPath(views.ReadOnlyDoc(l, doc, false), doc), nil
 	}
 	if isOffice, engine := office(doc, in); isOffice {
-		if in.Event == "action" && in.ActionID == "convert" {
+		if pressed(in, "convert") {
 			return convertJob(), nil
 		}
 		return withPath(views.SignOffice(l, doc, engine), doc), nil
@@ -74,7 +89,7 @@ func (a *App) viewSignSelf(in *wire.ViewEventInput) (*wire.Surface, error) {
 	switch {
 	case in.Event == "open":
 		st.Step = views.SelfStepFields
-	case in.Event == "action" && in.ActionID == "back":
+	case pressed(in, "back"):
 		if err := a.absorbSelf(&st, vals, l); err != nil {
 			a.logf("warn", "sign yourself: the posted boxes could not be read: %v", err)
 			errs[views.IDFields] = unreadableBoxes()
@@ -284,7 +299,7 @@ func (a *App) viewRequest(in *wire.ViewEventInput) (*wire.Surface, error) {
 		return withPath(views.ReadOnlyDoc(l, doc, true), doc), nil
 	}
 	if isOffice, engine := office(doc, in); isOffice {
-		if in.Event == "action" && in.ActionID == "convert" {
+		if pressed(in, "convert") {
 			return convertJob(), nil
 		}
 		return withPath(views.RequestOffice(l, doc, engine), doc), nil
@@ -293,7 +308,7 @@ func (a *App) viewRequest(in *wire.ViewEventInput) (*wire.Surface, error) {
 	// sent a request on this document while this wizard was being filled
 	// in, and Send must not become the host's bare "Invalid data".
 	prev, _ := a.load(docRef)
-	if in.Event == "action" && in.ActionID == views.ActionOpenStatus && doc.Path != "" {
+	if pressed(in, views.ActionOpenStatus) && doc.Path != "" {
 		return &wire.Surface{Open: &wire.OpenRequest{Path: doc.Path, View: ViewStatus}}, nil
 	}
 	if prev != nil && !prev.Status.Closed() {
@@ -311,7 +326,7 @@ func (a *App) viewRequest(in *wire.ViewEventInput) (*wire.Surface, error) {
 		life := st.Life
 		st = views.NewRequestState()
 		st.Life = life
-	case in.Event == "action" && in.ActionID == "back":
+	case pressed(in, "back"):
 		if err := absorb(&st, vals, l); err != nil {
 			a.logf("warn", "request wizard: the posted boxes could not be read: %v", err)
 			errs[views.IDFields] = unreadableBoxes()
@@ -543,15 +558,15 @@ func (a *App) fillFlow(l views.Lang, in *wire.ViewEventInput, doc views.Doc, env
 	vals := valuesOf(in)
 	errs := map[string]wire.Text{}
 
-	if in.Event == "action" && (in.ActionID == "decline" || in.ActionID == "decline_confirm") && !env.Options.AllowDecline {
+	if (pressed(in, "decline") || pressed(in, "decline_confirm")) && !env.Options.AllowDecline {
 		// The button is not drawn, but a crafted event must not open a door
 		// the requester closed.
 		return withPath(views.Fill(l, doc, env, sg, st, nil), doc), nil
 	}
 	switch {
-	case in.Event == "action" && in.ActionID == "decline":
+	case pressed(in, "decline"):
 		return views.Decline(l, env, sg, nil), nil
-	case in.Event == "action" && in.ActionID == "decline_confirm":
+	case pressed(in, "decline_confirm"):
 		params := map[string]any{"op": "decline", "envelope_id": env.ID, "signer_id": sg.ID,
 			"reason": str(vals, "decline_reason")}
 		if visitorIP != "" {
@@ -559,7 +574,7 @@ func (a *App) fillFlow(l views.Lang, in *wire.ViewEventInput, doc views.Doc, env
 		}
 		return &wire.Surface{Job: &wire.JobRequest{ActionID: ActionApply, Params: params,
 			Output: &wire.Output{Mode: envelope.OutputNone}}}, nil
-	case in.Event == "action" && in.ActionID == "back":
+	case pressed(in, "back"):
 		a.absorbFill(env, sg, &st, vals)
 		if st.Step > views.FillStepIntro {
 			st.Step--
@@ -778,11 +793,11 @@ func (a *App) viewStatus(in *wire.ViewEventInput) (*wire.Surface, error) {
 		st.RemindDue = a.remindDue(env)
 	}
 	switch {
-	case in.Event == "action" && in.ActionID == "link":
+	case pressed(in, "link"):
 		rowID, _ := in.Data["row_id"].(string)
 		st.ShowLinkFor = rowID
 		return views.Status(l, st), nil
-	case in.Event == "action" && in.ActionID == "remind":
+	case pressed(in, "remind"):
 		rowID, _ := in.Data["row_id"].(string)
 		if env == nil || env.Signer(rowID) == nil {
 			st.Toast = views.T("Unknown signer.", "Bilinmeyen imzacı.")
@@ -790,19 +805,19 @@ func (a *App) viewStatus(in *wire.ViewEventInput) (*wire.Surface, error) {
 		}
 		return &wire.Surface{Job: &wire.JobRequest{ActionID: ActionApply,
 			Params: map[string]any{"op": "remind", "signer_id": rowID}, Output: &wire.Output{Mode: envelope.OutputNone}}}, nil
-	case in.Event == "action" && in.ActionID == "cancel":
+	case pressed(in, "cancel"):
 		if env == nil {
 			return views.Status(l, st), nil
 		}
 		return &wire.Surface{Job: &wire.JobRequest{ActionID: ActionApply,
 			Params: map[string]any{"op": "cancel"}, Output: &wire.Output{Mode: envelope.OutputNone}}}, nil
-	case in.Event == "action" && in.ActionID == "expire":
+	case pressed(in, "expire"):
 		if env == nil {
 			return views.Status(l, st), nil
 		}
 		return &wire.Surface{Job: &wire.JobRequest{ActionID: ActionApply,
 			Params: map[string]any{"op": "expire"}, Output: &wire.Output{Mode: envelope.OutputNone}}}, nil
-	case in.Event == "action" && in.ActionID == "audit":
+	case pressed(in, "audit"):
 		if env == nil {
 			return views.Status(l, st), nil
 		}

@@ -130,9 +130,9 @@ func (a *App) receiptOf(ref string, env *envelope.Envelope, sg *envelope.Signer,
 				stem := receipt.Stem(env.Document, sg.Person.Identity())
 				in.Files = []views.ReceiptFile{
 					{Name: stem + ".p7b", What: views.T("your certificate and the authority's, as a PKCS#7 bundle",
-						"sertifikanız ve makamın sertifikası, PKCS#7 demeti olarak")},
+						"sertifikanız ve makamın sertifikası, PKCS#7 paketi olarak")},
 					{Name: stem + ".pem", What: views.T("the same two certificates as text", "aynı iki sertifika, metin olarak")},
-					{Name: stem + ".txt", What: views.T("the facts in words, with both fingerprints", "gerçekler, iki parmak iziyle birlikte")},
+					{Name: stem + ".txt", What: views.T("the facts in words, with both fingerprints", "bilgiler düz metin olarak, iki parmak iziyle birlikte")},
 				}
 			}
 		}

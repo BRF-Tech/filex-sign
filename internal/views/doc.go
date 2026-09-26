@@ -395,11 +395,13 @@ func FontOptions(l Lang) []map[string]any {
 func FontSelect(l Lang, key, en, tr string) wire.Field {
 	var opts []wire.FieldOption
 	for _, f := range fontkit.All() {
-		suffix := l.S(" (official)", " (resmî)")
-		if f.Script {
-			suffix = l.S(" (handwriting)", " (el yazısı)")
-		}
-		opts = append(opts, wire.FieldOption{Value: f.ID, Label: f.Family + suffix})
+		label := Each(func(l Lang) string {
+			if f.Script {
+				return f.Family + l.S(" (handwriting)", " (el yazısı)")
+			}
+			return f.Family + l.S(" (official)", " (resmî)")
+		})
+		opts = append(opts, optIn(l, f.ID, label))
 	}
 	return choice(l, key, en, tr, fontkit.DefaultID, opts...)
 }

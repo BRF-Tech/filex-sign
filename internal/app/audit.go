@@ -175,10 +175,10 @@ func (a *App) auditLines(env *envelope.Envelope, l views.Lang) ([]pdfdoc.AuditLi
 		lines = append(lines, line(ca.Name), muted("SHA-256 "+ca.FP))
 		if ca.Retired > 0 {
 			lines = append(lines, muted(l.Sf("%d retired authority/authorities are still trusted for the signatures they made",
-				"emekliye ayrılan %d makam, attığı imzalar için hâlâ güvenilir sayılıyor", ca.Retired)))
+				"Kullanımdan kaldırılan %d makam, attığı imzalar için hâlâ güvenilir sayılıyor", ca.Retired)))
 		}
 	} else {
-		lines = append(lines, muted(l.S("not available when this trail was written", "bu iz yazılırken erişilemiyordu")))
+		lines = append(lines, muted(l.S("not available when this trail was written", "Bu iz yazılırken erişilemiyordu")))
 	}
 
 	// The completion: what the document permits, filex's seal, and the

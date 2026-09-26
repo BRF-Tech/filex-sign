@@ -184,7 +184,7 @@ func violationWords(s verify.Signature, v verify.Violation) wire.Text {
 		case s.Seal:
 			return l.Sf("Not permitted by filex's seal: %s.", "filex'in mührü buna izin vermiyor: %s.", w)
 		case s.Certification > 0:
-			return l.Sf("Not permitted by the certification: %s.", "onay imzası buna izin vermiyor: %s.", w)
+			return l.Sf("Not permitted by the certification: %s.", "Onay imzası buna izin vermiyor: %s.", w)
 		}
 		return l.Sf("Not permitted by signature %d: %s.", "%d. imza buna izin vermiyor: %s.", s.Index, w)
 	})
@@ -417,7 +417,7 @@ func coverWords(l Lang, sig verify.Signature) wire.Text {
 		return T("the whole file", "dosyanın tamamı")
 	}
 	return Tf("the first %d of %d bytes — the rest was appended afterwards",
-		"%d baytın ilki %d bayt — geri kalanı sonradan eklendi", sig.SignedBytes, sig.FileBytes)
+		"%[2]d baytın ilk %[1]d baytı — geri kalanı sonradan eklendi", sig.SignedBytes, sig.FileBytes)
 }
 
 func changeWords(l Lang, sig verify.Signature) wire.Text {
@@ -459,18 +459,55 @@ func certValidWords(l Lang, sig verify.Signature) wire.Text {
 	return Tf("%s — the signing moment falls OUTSIDE it", "%s — imza anı bu aralığın DIŞINDA", window)
 }
 
+// usageWords names what the certificate says it may be used for. verify
+// reports the uses as English identifiers; they become words here, in each
+// language — "document signing, e-mail protection · digital signature,
+// non-repudiation" was printed on every Turkish signature card (2026-09-26).
 func usageWords(l Lang, sig verify.Signature) wire.Text {
-	var parts []string
-	if len(sig.Cert.EKU) > 0 {
-		parts = append(parts, strings.Join(sig.Cert.EKU, ", "))
-	}
-	if len(sig.Cert.KeyUsage) > 0 {
-		parts = append(parts, strings.Join(sig.Cert.KeyUsage, ", "))
-	}
-	if len(parts) == 0 {
+	if len(sig.Cert.EKU) == 0 && len(sig.Cert.KeyUsage) == 0 {
 		return T("not stated", "belirtilmemiş")
 	}
-	return Plain(strings.Join(parts, " · "))
+	return Each(func(l Lang) string {
+		var parts []string
+		for _, group := range [][]string{sig.Cert.EKU, sig.Cert.KeyUsage} {
+			if len(group) == 0 {
+				continue
+			}
+			names := make([]string, 0, len(group))
+			for _, id := range group {
+				names = append(names, In(usageName(id), l))
+			}
+			parts = append(parts, strings.Join(names, ", "))
+		}
+		return strings.Join(parts, " · ")
+	})
+}
+
+// usageName is one certificate use (verify's identifier) in words; an
+// identifier verify did not name (an OID) stays as it is.
+func usageName(id string) wire.Text {
+	switch id {
+	case "document signing":
+		return T("document signing", "belge imzalama")
+	case "e-mail protection":
+		return T("e-mail protection", "e-posta koruması")
+	case "client authentication":
+		return T("client authentication", "istemci kimlik doğrulaması")
+	case "digital signature":
+		return T("digital signature", "dijital imza")
+	case "non-repudiation":
+		return T("non-repudiation", "inkâr edilemezlik")
+	case "key encipherment":
+		return T("key encipherment", "anahtar şifreleme")
+	case "certificate signing":
+		return T("certificate signing", "sertifika imzalama")
+	case "CRL signing":
+		return T("CRL signing", "CRL imzalama")
+	}
+	if n, ok := strings.CutPrefix(id, "usage "); ok {
+		return Tf("usage %s", "kullanım %s", n)
+	}
+	return Plain(id)
 }
 
 func rootWords(l Lang, sig verify.Signature) wire.Text {

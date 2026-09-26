@@ -290,8 +290,8 @@ func Request(l Lang, doc Doc, st RequestState, labels []SignerLabel, errs map[st
 			wire.Node{ID: IDSigners, Type: "people-picker", Props: map[string]any{
 				"value": peopleProp(st.Signers), "multi": true, "allow_external": true}},
 			form([]wire.Field{
-				withHelp(withHint(longField(l, "identities", "Identity", "Kimlik"),
-					l.S("Ali Yılmaz <ali@example.com>", "Ali Yılmaz <ali@ornek.com>")),
+				withHelp(withHintIn(longField(l, "identities", "Identity", "Kimlik"),
+					l, "Ali Yılmaz <ali@example.com>", "Ali Yılmaz <ali@ornek.com>"),
 					l, "One signer per line: a name, an e-mail address, or both. Somebody with no address still gets a link and a PIN — shown to YOU, to pass on by hand.",
 					"Her satıra bir imzacı: ad, e-posta ya da ikisi. Adresi olmayana da bağlantı ve PIN üretilir — SİZE gösterilir, elden iletirsiniz."),
 			}, map[string]any{"identities": st.Identities}),
@@ -386,8 +386,8 @@ func Request(l Lang, doc Doc, st RequestState, labels []SignerLabel, errs map[st
 			withHelp(boolField(l, "lock_signed", "Lock the signed file when every signature is in", "Her imza gelince imzalı dosyayı kilitle", false),
 				l, "Yes: once the last signature and filex's seal are in, the signed file is locked for good — nobody, not even an administrator, can change, move or delete it until an administrator lifts the lock on this app's page under Apps (lifting it is recorded). No: afterwards the signed file is an ordinary file. Either way the document is certified and sealed and every party is sent its SHA-256, so any later change shows.",
 				"Evet: son imza ve filex'in mührü eklenince imzalı dosya kalıcı olarak kilitlenir — bir yönetici kilidi Uygulamalar altındaki bu uygulamanın sayfasından kaldırana kadar (kaldırma kayda geçer) kimse, yönetici bile, onu değiştiremez, taşıyamaz ya da silemez. Hayır: bundan sonra imzalı dosya sıradan bir dosyadır. İki durumda da belge onaylanmış ve mühürlenmiştir ve her tarafa SHA-256 özeti gönderilir; sonradan yapılan her değişiklik görünür."),
-			withHint(longField(l, "message", "A message to the signers (optional)", "İmzacılara mesaj (isteğe bağlı)"),
-				l.S("Please sign by Friday.", "Lütfen cumaya kadar imzalayın.")),
+			withHintIn(longField(l, "message", "A message to the signers (optional)", "İmzacılara mesaj (isteğe bağlı)"),
+				l, "Please sign by Friday.", "Lütfen cumaya kadar imzalayın."),
 		)
 		s.Nodes = append(s.Nodes, heading(T("How should the request behave?", "İstek nasıl davransın?")), form(fs, vals))
 		s.Actions = []wire.SurfaceAction{backButton(), nextButton()}

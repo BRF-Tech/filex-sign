@@ -179,7 +179,7 @@ func summary(in Input) string {
 	}
 	b.WriteString("\n")
 	line("CERTIFICATE", "SERTİFİKA")
-	line("Issued to:   %s", "Verilen:     %s", nameOf(in.Leaf))
+	line("Issued to:   %s", "Sahibi:      %s", nameOf(in.Leaf))
 	if len(in.Leaf.EmailAddresses) > 0 {
 		line("E-mail:      %s", "E-posta:     %s", in.Leaf.EmailAddresses[0])
 	}

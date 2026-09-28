@@ -119,6 +119,12 @@ refused with 403. Administrators always hold it; for everybody else the
 person's own exception decides first, then their custom role, then the
 built-in role's decision, and only then the default above.
 
+The app's own screens follow the same answer: filex tells it which of its
+permissions the reader holds, so the document's **Signatures** panel, the
+**Verify** screen and the **Signatures** screen suggest **Request
+signatures…** only to somebody who holds it. Everybody else is pointed at
+**Sign…** alone.
+
 Nothing else is behind it, on purpose:
 
 - **Signing** — **Sign…** on your own document, **Sign / Fill** when somebody
@@ -381,7 +387,7 @@ signature is written, so the certificate proves identity and can sign nothing.
 | Expiry | A request that runs out at 03:00 **closes at 03:00**, with nobody present: filex wakes the app hourly and runs the closure at the minute it falls due — record closed, file released, links revoked, both sides told. The first job to touch a lapsed request still closes it too, so an instance whose wake-up is off (a demo) loses nothing. A freeze always carries a TTL, so nothing stays locked for ever. |
 | Link life | No longer than the lowest of: what you asked for, the signing page's own 90 days, and what this installation allows ANY shared link (Admin → Protection, 7 days unless changed). The Time step offers no more than that and says why; the review, the record and the requester's notice all give the real day. |
 | Ended links | A signing link revoked or deleted on the Shares screen closes its request as cancelled, within seconds; the panel says whose link it was. A link that simply ran out closes the request as expired, at its own minute. |
-| Who may ask | Accounts that hold **Request signatures** (`app.sign.request`): by default those that can change files, never viewers; the administrator decides per role and per person. The app is not told whether the reader holds it, so the hints on its screens ("…or Request signatures… to ask others") are drawn for everybody. |
+| Who may ask | Accounts that hold **Request signatures** (`app.sign.request`): by default those that can change files, never viewers; the administrator decides per role and per person. filex tells the app whether the reader holds it, so the hints on its screens ("…or Request signatures… to ask others") are drawn only for those who do. |
 | Requests per document | One open at a time. After it has ended, a new request replaces its record in the Signatures panel; the signatures stay in the file and Verify still reports them. |
 | Audit trail | Written beside the document when the request completes **and** the output is a new file; with a version output it is one click in the panel (a job commits one kind of output). In the requester's language, whoever's signature completed the request. |
 | Receipts | A share that lives 30 days. Download the three files and keep them; the certificate itself is kept with the document, so the receipt can be given again from the Sign / Fill screen. |

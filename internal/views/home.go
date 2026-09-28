@@ -122,6 +122,9 @@ type HomeInput struct {
 	CAName   string
 	CAFP     string
 	Office   bool
+	// CanRequest: the reader holds the app's `request` permission, so
+	// "How this works" may tell them to "Request signatures…".
+	CanRequest bool
 }
 
 // The Signatures page's sections — the page's menu (wire.Surface.Sections),
@@ -273,9 +276,14 @@ func Home(l Lang, in HomeInput) *wire.Surface {
 // homeAbout is the "How it works" section: how to start, what a box is,
 // who can sign, and which authority signs.
 func homeAbout(l Lang, in HomeInput) []wire.Node {
+	start := T("Right-click a document → “Sign…” to sign it yourself. While a request is open the same menu offers “Sign / Fill” on that document. “Verify” is offered on every PDF, signed here or anywhere else.",
+		"Bir belgeye sağ tıklayın → kendiniz imzalamak için “İmzala…”. Bir istek açıkken aynı menü o belgede “İmzala / Doldur” gösterir. “Doğrula” her PDF'te vardır — burada imzalanmış olsun olmasın.")
+	if in.CanRequest {
+		start = T("Right-click a document → “Sign…” to sign it yourself, or “Request signatures…” to ask others. While a request is open the same menu offers “Sign / Fill” on that document. “Verify” is offered on every PDF, signed here or anywhere else.",
+			"Bir belgeye sağ tıklayın → kendiniz imzalamak için “İmzala…”, başkalarından istemek için “İmza iste…”. Bir istek açıkken aynı menü o belgede “İmzala / Doldur” gösterir. “Doğrula” her PDF'te vardır — burada imzalanmış olsun olmasın.")
+	}
 	n := []wire.Node{heading(T("How this works", "Bu nasıl çalışır")),
-		text(T("Right-click a document → “Sign…” to sign it yourself, or “Request signatures…” to ask others. While a request is open the same menu offers “Sign / Fill” on that document. “Verify” is offered on every PDF, signed here or anywhere else.",
-			"Bir belgeye sağ tıklayın → kendiniz imzalamak için “İmzala…”, başkalarından istemek için “İmza iste…”. Bir istek açıkken aynı menü o belgede “İmzala / Doldur” gösterir. “Doğrula” her PDF'te vardır — burada imzalanmış olsun olmasın.")),
+		text(start),
 		text(T("Boxes have names. Whoever places them names each one, and the signer fills a plain form of those names before seeing the finished document and approving it.",
 			"Kutuların adı vardır. Yerleştiren kişi her birine bir ad verir; imzacı da önce o adlardan oluşan sade bir formu doldurur, sonra belgenin son hâlini görüp onaylar.")),
 		text(T("A signer does not need an e-mail address. An identity is a name, an address, or both; somebody with no address gets a link and a PIN that are shown to the requester, who hands them over.",

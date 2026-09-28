@@ -24,7 +24,10 @@ func (a *App) actionApply(in *wire.ActionRunInput) (*wire.ActionRunOutput, error
 	ref := in.Inputs[0].Ref
 	env, err := a.load(ref)
 	if err != nil {
-		return fail("This document has no signature request. Start one with “Request signatures…”.", "Bu belgenin imza isteği yok. “İmza iste…” ile başlatın.")
+		if in.Actor.Can(PermRequest) {
+			return fail("This document has no signature request. Start one with “Request signatures…”.", "Bu belgenin imza isteği yok. “İmza iste…” ile başlatın.")
+		}
+		return fail("This document has no signature request.", "Bu belgenin imza isteği yok.")
 	}
 	op := str(in.Params, "op")
 	scheduled := boolOf(in.Params, paramScheduled)

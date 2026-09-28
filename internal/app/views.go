@@ -787,7 +787,7 @@ func (a *App) viewStatus(in *wire.ViewEventInput) (*wire.Surface, error) {
 	}
 	ca := a.ca()
 	st := views.StatusInput{Doc: doc, Env: env, SignaturesInFile: a.countSignatures(in),
-		CAName: ca.Name, CAFP: ca.FP}
+		CAName: ca.Name, CAFP: ca.FP, CanRequest: in.Context.Actor.Can(PermRequest)}
 	if env != nil {
 		st.Expired = a.expired(env)
 		st.RemindDue = a.remindDue(env)
@@ -882,6 +882,10 @@ func (a *App) viewHome(in *wire.ViewEventInput) (*wire.Surface, error) {
 		// The section the page's address names (`data.section` on the
 		// opening event), else the one this screen was already showing.
 		Section: homeSectionOf(in),
+		// Whether "How this works" may say "Request signatures…": filex
+		// tells the app which of its permissions the reader holds
+		// (filex 0.49.0, wire.Actor.Permissions).
+		CanRequest: in.Context.Actor.Can(PermRequest),
 	}
 	var actorID int64
 	email := ""

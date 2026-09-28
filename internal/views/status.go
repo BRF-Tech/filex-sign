@@ -72,6 +72,11 @@ type StatusInput struct {
 	Toast            wire.Text
 	CAName           string
 	CAFP             string
+	// CanRequest: the reader holds the app's `request` permission
+	// (wire.Actor.Can), so the panel may point them at "Request
+	// signatures…". A person the menu does not offer it to is not told to
+	// use it.
+	CanRequest bool
 }
 
 // Status draws the details-panel section.
@@ -85,8 +90,12 @@ func Status(l Lang, in StatusInput) *wire.Surface {
 				muted(T("Right-click it → “Verify” to see who signed it and what each signature covers.",
 					"Kimin imzaladığını ve her imzanın neyi kapsadığını görmek için sağ tıklayın → “Doğrula”.")))
 		}
-		s.Nodes = append(s.Nodes, muted(T("Use “Sign…” to sign it yourself or “Request signatures…” to invite others.",
-			"Kendiniz imzalamak için “İmzala…”, başkalarını davet etmek için “İmza iste…” kullanın.")))
+		if in.CanRequest {
+			s.Nodes = append(s.Nodes, muted(T("Use “Sign…” to sign it yourself or “Request signatures…” to invite others.",
+				"Kendiniz imzalamak için “İmzala…”, başkalarını davet etmek için “İmza iste…” kullanın.")))
+		} else {
+			s.Nodes = append(s.Nodes, muted(T("Use “Sign…” to sign it yourself.", "Kendiniz imzalamak için “İmzala…” kullanın.")))
+		}
 		return s
 	}
 	signed, total := env.Progress()

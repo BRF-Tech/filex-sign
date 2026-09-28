@@ -21,6 +21,9 @@ type VerifyInput struct {
 	// Sent is the SHA-256 this installation sent to every party when a
 	// request completed with THIS file — nil when no record names it.
 	Sent *SentHash
+	// CanRequest: the reader holds the app's `request` permission, so an
+	// unsigned document may point them at "Request signatures…".
+	CanRequest bool
 }
 
 // SentHash is the completion record a file's hash was compared with.
@@ -45,10 +48,14 @@ func Verify(l Lang, in VerifyInput) *wire.Surface {
 	}
 	rep := in.Report
 	if rep == nil || !rep.Signed() {
+		hint := T("Use “Sign…” to sign it yourself.", "Kendiniz imzalamak için “İmzala…” kullanın.")
+		if in.CanRequest {
+			hint = T("Use “Sign…” to sign it yourself, or “Request signatures…” to ask others.",
+				"Kendiniz imzalamak için “İmzala…”, başkalarından istemek için “İmza iste…” kullanın.")
+		}
 		s.Nodes = []wire.Node{
 			info(T("This document carries no electronic signature.", "Bu belgede elektronik imza yok.")),
-			muted(T("Use “Sign…” to sign it yourself, or “Request signatures…” to ask others.",
-				"Kendiniz imzalamak için “İmzala…”, başkalarından istemek için “İmza iste…” kullanın.")),
+			muted(hint),
 		}
 		if rep != nil {
 			s.Nodes = append(s.Nodes, authorityNodes(l, rep)...)

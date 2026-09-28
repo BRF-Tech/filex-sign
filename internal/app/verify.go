@@ -30,7 +30,7 @@ func (a *App) report(ref string) (*verify.Report, error) {
 func (a *App) viewVerify(in *wire.ViewEventInput) (*wire.Surface, error) {
 	l := langOfView(in)
 	doc := docOf(in, docRef)
-	out := views.VerifyInput{Doc: doc, Timestamps: a.tsa() != ""}
+	out := views.VerifyInput{Doc: doc, Timestamps: a.tsa() != "", CanRequest: in.Context.Actor.Can(PermRequest)}
 	if len(in.Context.Inputs) > 0 && in.Context.Inputs[0].Size > maxInspectBytes {
 		out.Err = l.S("the document is too large to check here", "belge burada denetlenemeyecek kadar büyük")
 		return views.Verify(l, out), nil

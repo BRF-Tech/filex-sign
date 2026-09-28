@@ -40,6 +40,14 @@ On filex v0.43.0–v0.48.x, stay on 0.1.1.
 - `TestManifest_AskingIsAPermissionSigningIsNot` holds the line: exactly one
   user permission, labelled and described in every language, only `request`
   and its view gated, and every action requiring what its view requires.
+- **The hints follow the permission.** filex 0.49.0 tells the app which of
+  its permissions the reader holds (`actor.permissions`). The document's
+  Signatures panel, the Verify screen and the Signatures screen's "How this
+  works" say "…or Request signatures… to ask others" only to a reader who
+  holds it, and so does the answer to Remind or Cancel on a document with no
+  request ("Start one with Request signatures…"); everybody else is pointed
+  at Sign… alone, in all five languages.
+  `TestHints_RequestSignaturesIsOfferedOnlyToWhoMayAsk`.
 
 ### Changed
 - `scripts/build.sh`, while go.mod `replace`s the SDK with a local

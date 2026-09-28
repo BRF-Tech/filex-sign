@@ -555,6 +555,18 @@ nothing else. filex drops the menu row for an account without it and answers
 403 to the run, the view's open and every event of it; the app itself never
 asks. See §19 for why `apply`, `status` and `envelopes` stay open.
 
+The hints that POINT at it are the app's own, so they follow what filex tells
+it: from filex 0.49.0 every job, view event and interface call carries the
+ids of this app's permissions the reader holds (`actor.permissions`,
+`wire.Actor.Can`). "…or Request signatures… to ask others" on the Signatures
+panel (no request yet), on Verify (an unsigned document) and in the
+Signatures screen's "How this works", and "Start one with Request
+signatures…" in the answer to an `apply` on a document with no request, are
+said only to a reader who holds `request`; everybody else reads the sentence
+without it. No actor (an older filex does not say) reads as "does not hold":
+a hint left out is a smaller wrong than a door offered and then shut
+(`TestHints_RequestSignaturesIsOfferedOnlyToWhoMayAsk`).
+
 ⚠ A document on a storage that takes no writes (`FileRef.read_only`) never
 reaches step one: the first screen says the signed document could never be
 saved there, and the `request` job refuses the same way before it writes a
@@ -1057,13 +1069,13 @@ Turkish trail and checks it rune by rune.
 - ~~**A timer, or a "run me later" job.**~~ Shipped: the `schedule` permission
   and the `tick` export (§12a). Expiry and reminders are no longer something a
   person has to click.
-- **Which of its own permissions the reader holds.** filex decides
-  `app.sign.request` on every door, but the call does not say how it decided,
-  so the hints on the Signatures panel, the Verify screen and the Signatures
-  screen ("…or Request signatures… to ask others") are drawn for everybody,
-  including a person the menu no longer offers it to. A list of the actor's
-  granted app permissions in the call context would let them say only what
-  the reader can do.
+- ~~**Which of its own permissions the reader holds.**~~ Shipped in filex
+  0.49.0: a job, a view event and an interface call carry
+  `actor.permissions`, the ids of this app's `user_permissions` the reader
+  holds, decided by the same question filex asks at the door. The hints on
+  the Signatures panel, the Verify screen and the Signatures screen ("…or
+  Request signatures… to ask others") are now drawn only for a reader who
+  holds `request` (§10).
 - **An output mode on a scheduled item.** A surface's `job` may override the
   action's output mode; a schedule item may not, so unattended work has to
   ride an action whose manifest mode it can live with.

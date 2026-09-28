@@ -1,7 +1,7 @@
 {
   "manifest_version": 1,
   "name": "sign",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "label": {
     "en": "e-Signature",
     "tr": "e-İmza",
@@ -18,7 +18,7 @@
   },
   "icon": "sign",
   "homepage": "https://github.com/BRF-Tech/filex-sign",
-  "min_filex": "0.43.0",
+  "filex": ">=0.49.0",
   "languages": [
     "en",
     "tr",
@@ -188,6 +188,26 @@
       }
     }
   ],
+  "user_permissions": [
+    {
+      "id": "request",
+      "label": {
+        "en": "Request signatures",
+        "tr": "İmza isteme",
+        "es": "Solicitar firmas",
+        "de": "Unterschriften anfordern",
+        "fr": "Demander des signatures"
+      },
+      "description": {
+        "en": "Start a signature request: the “Request signatures…” menu item and its screen. Signing, filling in what was asked and Verify need no permission, and a request already sent can still be followed, reminded and cancelled.",
+        "tr": "İmza isteği başlatmak: “İmza iste…” menü satırı ve ekranı. İmzalamak, istenenleri doldurmak ve Doğrula için izin gerekmez; gönderilmiş bir istek yine izlenebilir, hatırlatılabilir ve iptal edilebilir.",
+        "es": "Iniciar una solicitud de firma: la opción “Solicitar firmas…” del menú y su pantalla. Firmar, completar lo solicitado y Verificar no requieren permiso, y una solicitud ya enviada se puede seguir, recordar y cancelar.",
+        "de": "Eine Unterschriftsanfrage starten: der Menüeintrag „Unterschriften anfordern…“ und sein Bildschirm. Unterschreiben, das Ausfüllen des Angeforderten und Prüfen brauchen keine Berechtigung; bei einer bereits gesendeten Anfrage bleiben Verfolgen, Erinnern und Abbrechen möglich.",
+        "fr": "Lancer une demande de signature : l’entrée « Demander des signatures… » du menu et son écran. Signer, remplir ce qui est demandé et Vérifier ne demandent aucune autorisation, et une demande déjà envoyée peut toujours être suivie, relancée et annulée."
+      },
+      "default": "user"
+    }
+  ],
   "actions": [
     {
       "id": "sign",
@@ -285,7 +305,8 @@
       },
       "limits": {
         "timeout_s": 600
-      }
+      },
+      "requires": "request"
     },
     {
       "id": "fill",
@@ -433,7 +454,8 @@
         "de": "Unterschriften anfordern",
         "fr": "Demander des signatures"
       },
-      "size": "xl"
+      "size": "xl",
+      "requires": "request"
     },
     {
       "id": "sign-fill",
@@ -572,6 +594,6 @@
   },
   "wasm": {
     "url": "https://github.com/BRF-Tech/filex-sign/releases/download/{tag}/plugin.wasm",
-    "sha256": "e1e24963685022ff667fa8c3af06382220ba240f0e0b08c4b88281336aeb4971"
+    "sha256": ""
   }
 }

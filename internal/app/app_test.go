@@ -233,14 +233,9 @@ func loadEnv(t *testing.T, a *App) *envelope.Envelope {
 // at install, and a test says so before the install does.
 func TestManifestPassesTheSDKsOwnChecks(t *testing.T) {
 	a, _ := newApp(t)
-	// ⚠⚠ WORKAROUND, NOT A CHOICE. `schedule` is a real permission of the
-	// host (wasmplugin.PermSchedule, and the install accepts it — see the
-	// live run in the handover), but the test kit's own closed set
-	// (plugintest.Permissions, surface.go) was not extended with it when
-	// the wake-up was built, so CheckManifest calls it "unknown permission".
-	// Drop this line the moment the SDK ships the fix; leaving it in after
-	// that would be a hole in the very check this test exists to run.
-	plugintest.Permissions["schedule"] = true
+	// No local additions to plugintest.Permissions: the kit knows every
+	// permission the host accepts (`schedule` since v0.43.0), so an unknown
+	// one here is a real refusal waiting at install.
 	plugintest.CheckManifest(t, filexsign.Manifest())
 	plugintest.CheckManifestLanguages(t, filexsign.Manifest())
 	plugintest.CheckRegistered(t, a.Plugin())
@@ -320,6 +315,78 @@ func TestManifestAndHandlersAgree(t *testing.T) {
 	for _, want := range []string{SettingTSAEnabled, SettingTSAURL} {
 		if !keys[want] {
 			t.Errorf("the manifest does not declare the %q setting", want)
+		}
+	}
+}
+
+// ⚠⚠ Asking people to sign is a permission the administrator hands out;
+// signing is not (Burak, 2026-09-28: "imza isteme bir yetki arkasında
+// olmalı; signlama izni diye bir şeye gerek yok"). filex refuses an action
+// or a view that `requires` a user permission to an account that does not
+// hold it — the menu row disappears, a direct run, a screen's open and its
+// events answer 403 — so what carries the requirement decides who is shut
+// out:
+//
+//   - `request` (the menu row) and the `request` wizard: that is asking.
+//   - NOT `apply`. It is hidden and queued by BOTH sides: the signer's
+//     Sign / Fill screen hands in a signature through it, and the
+//     Signatures panel's Remind / Cancel / Close the expired request go
+//     through it too. Gated, a signer without the permission could not
+//     sign, and a requester whose permission was taken away could no longer
+//     cancel the request that keeps somebody's file frozen.
+//   - NOT `status` (the details panel) or `envelopes` (the Signatures
+//     screen): they show a signer what is waiting for them and let a
+//     requester follow what was already sent.
+//   - NOT sign, fill, verify, convert, or the outside signer's page.
+func TestManifest_AskingIsAPermissionSigningIsNot(t *testing.T) {
+	m := filexsign.Manifest()
+	if len(m.UserPermissions) != 1 || m.UserPermissions[0].ID != PermRequest {
+		t.Fatalf("user_permissions: want exactly %q, got %+v", PermRequest, m.UserPermissions)
+	}
+	up := m.UserPermissions[0]
+	// `user`: accounts that can change files keep asking as they did before
+	// the permission existed; a read-only account never could (min_role
+	// editor on the file), and the administrator narrows it from there.
+	if up.Default != "user" {
+		t.Errorf("the request permission defaults to %q, want user", up.Default)
+	}
+	for _, lang := range views.Languages() {
+		if strings.TrimSpace(up.Label[lang]) == "" || strings.TrimSpace(up.Description[lang]) == "" {
+			t.Errorf("the request permission has no %s label or description", lang)
+		}
+	}
+	// filex before 0.49.0 does not know user_permissions or requires and
+	// refuses the whole manifest, so the range has to say so up front.
+	if m.Filex != ">=0.49.0" {
+		t.Errorf("filex: %q, want >=0.49.0 (the first filex that knows user_permissions)", m.Filex)
+	}
+
+	gatedActions := map[string]bool{ActionRequest: true}
+	gatedViews := map[string]bool{ViewRequest: true}
+	viewNeeds := map[string]string{}
+	for _, v := range m.Views {
+		want := ""
+		if gatedViews[v.ID] {
+			want = PermRequest
+		}
+		if v.Requires != want {
+			t.Errorf("view %s requires %q, want %q", v.ID, v.Requires, want)
+		}
+		viewNeeds[v.ID] = v.Requires
+	}
+	for _, act := range m.Actions {
+		want := ""
+		if gatedActions[act.ID] {
+			want = PermRequest
+		}
+		if act.Requires != want {
+			t.Errorf("action %s requires %q, want %q", act.ID, act.Requires, want)
+		}
+		// A menu row whose screen needs more than the row does is offered
+		// and then refused; one that needs less lets the screen's job run
+		// what the row would have refused.
+		if act.View != "" && viewNeeds[act.View] != act.Requires {
+			t.Errorf("action %s requires %q, its view %s requires %q", act.ID, act.Requires, act.View, viewNeeds[act.View])
 		}
 	}
 }

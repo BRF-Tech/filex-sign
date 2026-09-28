@@ -6,6 +6,50 @@ All notable changes to filex-sign are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] — not yet released (tagged once filex 0.49.0 is out)
+
+A minor version: a new permission and a new floor. **Needs filex v0.49.0**,
+the first filex that knows an app's own permissions — an older one refuses
+the manifest (it does not know `user_permissions` or `requires`). The
+manifest says so with `filex: ">=0.49.0"` in place of `min_filex: 0.43.0`.
+On filex v0.43.0–v0.48.x, stay on 0.1.1.
+
+### Added
+- **Asking for signatures is a permission.** The manifest declares one user
+  permission, **Request signatures** (`app.sign.request`, `user_permissions`
+  → `request`), in all five languages, default `user`: accounts that can
+  change files hold it until the administrator decides otherwise, per role
+  or per person, in filex's role editor. The **Request signatures…** action
+  and its wizard (`request` view) carry `requires: "request"`, so an account
+  without it does not see the menu row, and a direct run, opening the
+  wizard or any of its steps is refused with 403. Measured on filex built
+  from `rel/0.49`: a user sees the row. A user whose exception says deny and
+  a viewer do not, and get 403 on the action, the wizard and its events; a
+  user whose built-in role says deny loses the row and gets 403 on the
+  action, and has both back when the decision is cleared.
+- **Signing needs no permission.** Nothing else carries `requires`: Sign…,
+  Sign / Fill and the hidden `apply` a signer's screen queues, Verify, the
+  hidden `convert`, the outside signer's page, the document's Signatures
+  panel and the Signatures screen. `apply` is also what the panel's Remind,
+  Cancel request and Close the expired request queue, so a requester whose
+  permission is taken away still follows and cancels what they already sent —
+  gating it would have left their files frozen and their signers unable to
+  sign. Measured: the user refused the request permission still signs a
+  document himself, and Verify reports his signature and filex's seal as
+  valid.
+- `TestManifest_AskingIsAPermissionSigningIsNot` holds the line: exactly one
+  user permission, labelled and described in every language, only `request`
+  and its view gated, and every action requiring what its view requires.
+
+### Changed
+- `scripts/build.sh`, while go.mod `replace`s the SDK with a local
+  development copy, asks the copy that line names whether it is current. It
+  used to ask one fixed directory and skip the check in silence when that
+  directory, or node, was missing; now it refuses the build instead. With the
+  published SDK (no `replace`) nothing changes.
+- `TestManifestPassesTheSDKsOwnChecks` no longer adds `schedule` to the test
+  kit's permission list: the kit has known it since filex v0.43.0.
+
 ## [0.1.1] — 2026-09-26
 
 Proposed as **0.1.1** (a patch: fixes, one hidden action, no new permission,

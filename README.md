@@ -53,21 +53,31 @@ signature and giving one must not look like two products.
   installation's LibreOffice; without it the app says so instead of failing.
 - **The file can be frozen** while signatures are collected: read-only for
   everyone, administrators included, until the request ends.
+- **Who may ask is the administrator's call.** Asking others to sign is an
+  app permission, **Request signatures** (`app.sign.request`), that the
+  administrator grants or refuses per role and per person. Signing, filling
+  in, Verify and following a request already sent need none — see
+  [Who may request signatures](#who-may-request-signatures).
 - Signatures are **PAdES-B** (`ETSI.CAdES.detached`, ECDSA P-256 / SHA-256),
   each with a fresh certificate from **this installation's own signing
   authority**; the private key never leaves the server and is destroyed after
   one use. Time stamping (RFC 3161) is available and **off by default**.
 
-> Status: **v0.1.0**, the first public release. Step-by-step screens on
-> both sides, named boxes, identities without an e-mail address, receipts,
-> delivery of the finished document, verification on any PDF, real AcroForm
-> fields so a second signature does not disturb the first, optional time
-> stamping. See [Limits](#limits).
+> Status: **v0.2.0**. Step-by-step screens on both sides, named boxes,
+> identities without an e-mail address, receipts, delivery of the finished
+> document, verification on any PDF, real AcroForm fields so a second
+> signature does not disturb the first, optional time stamping, and asking
+> for signatures behind a permission the administrator hands out. See
+> [Limits](#limits).
 
 ## Install
 
+**Needs filex v0.49.0 or later** (the first filex that knows an app's own
+permissions; an older one refuses the manifest). On filex v0.43.0–v0.48.x,
+install `v0.1.1`.
+
 Admin → Plugins → Apps → Install → **GitHub repository** →
-`BRF-Tech/filex-sign` at a release tag (for example `v0.1.0`). filex fetches
+`BRF-Tech/filex-sign` at a release tag (for example `v0.2.0`). filex fetches
 `filex-app.json` from the tag, downloads `plugin.wasm` from the release and
 checks its sha256. Review the permissions and approve:
 
@@ -91,6 +101,35 @@ Signing needs `FILEX_SECRET_KEY` on the server (the authority and every key
 are sealed with it). The home screen (**Apps → Signatures**) says when signing
 is not available and why, names the signing authority with its SHA-256
 fingerprint, and says whether this installation can convert office documents.
+
+### Who may request signatures
+
+The table above is what the **app** may do. What each **person** may do with
+it adds one permission of the app's own, which filex lists under
+*e-Signature* in its role editor and in a person's exceptions:
+
+| Permission | Key | Until the administrator decides |
+|---|---|---|
+| **Request signatures** | `app.sign.request` | accounts that can change files (`user`); not viewers |
+
+It covers the two doors that **start** a request: the **Request signatures…**
+menu row and its eight-step screen. Without it the row is not in the menu, and
+running it anyway — the action, the screen, any of the screen's steps — is
+refused with 403. Administrators always hold it; for everybody else the
+person's own exception decides first, then their custom role, then the
+built-in role's decision, and only then the default above.
+
+Nothing else is behind it, on purpose:
+
+- **Signing** — **Sign…** on your own document, **Sign / Fill** when somebody
+  asked you, an outside signer's link. Being asked to sign is not something
+  the person asked can be refused.
+- **Verify**, on any PDF.
+- **Following a request already sent** — the document's **Signatures** panel
+  (Remind, Show link, Cancel request, Close the expired request, Save the audit
+  trail) and the **Signatures** screen. Taking the permission away stops the
+  next request, not the open ones: the requester can still cancel the request
+  that keeps a file frozen.
 
 ## What a signature from here is worth
 
@@ -249,6 +288,8 @@ The document's details panel → **Signatures**: state, order, deadline, freeze,
 who signed when, **Remind**, **Show link**, **Cancel request**, **Close the
 expired request**, the delivery link, the signing authority's fingerprint, and
 — when the signed file went in as a new version — **Save the audit trail**.
+None of it needs the *Request signatures* permission: a requester whose
+permission was taken away still follows, reminds and cancels what they sent.
 
 A signing link is an ordinary filex share, so it also appears under **My
 shares** and, for an administrator, under **Shares**. **Revoking or deleting
@@ -326,7 +367,7 @@ signature is written, so the certificate proves identity and can sign nothing.
 
 ## Limits
 
-| | v0.1.0 |
+| | v0.2.0 |
 |---|---|
 | Input | PDF, and any office document this installation's LibreOffice can open (ODT, DOCX, XLSX, PPTX, RTF, TXT…). Without LibreOffice, PDFs only. |
 | Refused | Encrypted PDFs (remove the password), XFA forms (flatten first). |
@@ -340,6 +381,7 @@ signature is written, so the certificate proves identity and can sign nothing.
 | Expiry | A request that runs out at 03:00 **closes at 03:00**, with nobody present: filex wakes the app hourly and runs the closure at the minute it falls due — record closed, file released, links revoked, both sides told. The first job to touch a lapsed request still closes it too, so an instance whose wake-up is off (a demo) loses nothing. A freeze always carries a TTL, so nothing stays locked for ever. |
 | Link life | No longer than the lowest of: what you asked for, the signing page's own 90 days, and what this installation allows ANY shared link (Admin → Protection, 7 days unless changed). The Time step offers no more than that and says why; the review, the record and the requester's notice all give the real day. |
 | Ended links | A signing link revoked or deleted on the Shares screen closes its request as cancelled, within seconds; the panel says whose link it was. A link that simply ran out closes the request as expired, at its own minute. |
+| Who may ask | Accounts that hold **Request signatures** (`app.sign.request`): by default those that can change files, never viewers; the administrator decides per role and per person. The app is not told whether the reader holds it, so the hints on its screens ("…or Request signatures… to ask others") are drawn for everybody. |
 | Requests per document | One open at a time. After it has ended, a new request replaces its record in the Signatures panel; the signatures stay in the file and Verify still reports them. |
 | Audit trail | Written beside the document when the request completes **and** the output is a new file; with a version output it is one click in the panel (a job commits one kind of output). In the requester's language, whoever's signature completed the request. |
 | Receipts | A share that lives 30 days. Download the three files and keep them; the certificate itself is kept with the document, so the receipt can be given again from the Sign / Fill screen. |
@@ -418,7 +460,7 @@ same test holds `filex-app.json`: every text in every declared language.
 filex v0.43.0 hands an app the reader's own language, a language pack's
 included, so `es`, `de` and `fr` are read as written. (Older hosts narrowed
 every locale but Turkish to `en` — they cannot install this app, which
-declares `min_filex: 0.43.0`.) The app answers `es`, `de` and `fr` whenever it
+declares `filex: ">=0.49.0"`.) The app answers `es`, `de` and `fr` whenever it
 is asked in them; the tests ask directly (`TestEveryLanguage_*`).
 
 The test suite is also where the product rules are enforced, not just the
@@ -474,7 +516,7 @@ The guest SDK is filex's own Go module, pinned in `go.mod` to the filex
 release this app targets:
 
 ```
-require github.com/brf-tech/filex/backend v0.43.0
+require github.com/brf-tech/filex/backend v0.49.0
 ```
 
 A fresh clone needs nothing else checked out: `go build` fetches

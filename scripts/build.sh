@@ -71,9 +71,20 @@ PY
 # without a sign: the module then compiles against a host contract the server
 # does not have, and nothing is red until somebody uses the app. The guard
 # lives in the copy itself and names the command that refreshes it; once
-# go.mod points at the published module it exits 0 without a word.
-if [ -f ../filex-sdk-dev/check-sdk.mjs ] && command -v node >/dev/null 2>&1; then
-  node ../filex-sdk-dev/check-sdk.mjs || exit 1
+# go.mod points at the published module there is no copy and nothing to ask.
+#
+# ⚠ The copy is whichever directory go.mod's `replace` names; its name follows
+# the filex release it was generated for. This used to ask ../filex-sdk-dev by
+# name and skip the check in silence when that directory was not there, or
+# when node was not on PATH — a guard that goes quiet exactly when it is
+# needed. A replace with no check (or no node) beside it refuses.
+SDK_COPY="$(sed -n 's#^replace github.com/brf-tech/filex/backend => \(\.[^ ]*\)[[:space:]]*$#\1#p' go.mod)"
+if [ -n "$SDK_COPY" ]; then
+  if [ ! -f "$SDK_COPY/check-sdk.mjs" ] || ! command -v node >/dev/null 2>&1; then
+    echo "go.mod replaces the filex SDK with $SDK_COPY, and $SDK_COPY/check-sdk.mjs (or node) is not there to say it is current" >&2
+    exit 1
+  fi
+  node "$SDK_COPY/check-sdk.mjs" || exit 1
 fi
 
 GOOS=wasip1 GOARCH=wasm go build -trimpath -buildvcs=false -ldflags="-s -w" -buildmode=c-shared -o "$OUT" ./cmd/plugin

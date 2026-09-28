@@ -548,6 +548,13 @@ signer. The identity box takes one signer per line: a name, an address, or
 of whom — no document on screen) and PLACED on the next (the document and
 nothing else).
 
+⚠⚠ **Asking is a permission (0.2.0, filex ≥ 0.49.0).** The manifest's one
+`user_permissions` entry, `request` (filex: `app.sign.request`, default
+`user`), is required by the `request` action and the `request` view — and by
+nothing else. filex drops the menu row for an account without it and answers
+403 to the run, the view's open and every event of it; the app itself never
+asks. See §19 for why `apply`, `status` and `envelopes` stay open.
+
 ⚠ A document on a storage that takes no writes (`FileRef.read_only`) never
 reaches step one: the first screen says the signed document could never be
 saved there, and the `request` job refuses the same way before it writes a
@@ -1002,6 +1009,17 @@ Turkish trail and checks it rune by rune.
 
 ## 19. Decisions worth knowing
 
+- **Asking is a permission; signing is not** (Burak, 2026-09-28). Only the
+  two doors that START a request — the `request` menu row and its wizard —
+  carry `requires: "request"`. `apply` does not: it is hidden and queued by
+  both sides, the signer's Sign / Fill screen (a signature, a refusal) and
+  the Signatures panel (Remind, Cancel request, Close the expired request,
+  Save the audit trail), so gating it would stop a signer from signing and a
+  requester who lost the permission from cancelling the request that keeps a
+  file frozen. `status` and `envelopes` do not either: they are where a signer
+  finds what waits for them. Taking the permission away stops the next
+  request, not the open ones. `TestManifest_AskingIsAPermissionSigningIsNot`
+  holds this, including "an action requires what its view requires".
 - **The request lives with the document.** No cross-document index, because
   filex gives a plugin none. A deleted file takes its request with it.
 - **`Apply` is pure.** Every transition is a table test; every effect is
@@ -1039,6 +1057,13 @@ Turkish trail and checks it rune by rune.
 - ~~**A timer, or a "run me later" job.**~~ Shipped: the `schedule` permission
   and the `tick` export (§12a). Expiry and reminders are no longer something a
   person has to click.
+- **Which of its own permissions the reader holds.** filex decides
+  `app.sign.request` on every door, but the call does not say how it decided,
+  so the hints on the Signatures panel, the Verify screen and the Signatures
+  screen ("…or Request signatures… to ask others") are drawn for everybody,
+  including a person the menu no longer offers it to. A list of the actor's
+  granted app permissions in the call context would let them say only what
+  the reader can do.
 - **An output mode on a scheduled item.** A surface's `job` may override the
   action's output mode; a schedule item may not, so unattended work has to
   ride an action whose manifest mode it can live with.
@@ -1102,6 +1127,10 @@ Beyond that, the suite enforces the rules that are this app's own:
   in each of es, de and fr — mails, notices, audit trail, Verify — speaks that
   language (`TestEveryLanguage_*`); and every letter those languages print,
   ß é ñ œ « » and the no-break spaces included, is in the face that draws it.
+- **who may ask**: exactly one user permission (`request`, default `user`,
+  labelled and described in every language); only the `request` action and
+  view require it; an action requires what its view requires; the manifest
+  says `filex: ">=0.49.0"` (`TestManifest_AskingIsAPermissionSigningIsNot`).
 - **surfaces**: at most one primary button per step; a `select` stays small
   enough to draw as buttons; `show_when` / `required_when` name a field of the
   same form; the file name is asked only when the output is a new file.

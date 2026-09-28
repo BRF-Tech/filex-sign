@@ -40,6 +40,13 @@ const (
 	ViewHome      = "envelopes"
 	PageSigner    = "signer"
 	PageReceipt   = "receipt"
+	// PermRequest is the one user permission the manifest declares
+	// (`user_permissions`, filex ≥ 0.49.0; filex calls it app.sign.request):
+	// the administrator decides per role and per person who may ASK for
+	// signatures. Only the menu row and the wizard that start a request
+	// carry it — signing, filling in, verifying and following a request
+	// already sent do not (TestManifest_AskingIsAPermissionSigningIsNot).
+	PermRequest = "request"
 	// Lock reasons: manifest `messages`, said by filex in each reader's
 	// language (pluginkit.FileLockMessage).
 	LockCollecting = "lock.collecting"

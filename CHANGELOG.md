@@ -6,7 +6,7 @@ All notable changes to filex-sign are listed here. The format follows
 
 ## [Unreleased]
 
-## [0.2.0] — not yet released (tagged once filex 0.49.0 is out)
+## [0.2.0] — 2026-09-29
 
 A minor version: a new permission and a new floor. **Needs filex v0.49.0**,
 the first filex that knows an app's own permissions — an older one refuses
@@ -57,6 +57,10 @@ On filex v0.43.0–v0.48.x, stay on 0.1.1.
   published SDK (no `replace`) nothing changes.
 - `TestManifestPassesTheSDKsOwnChecks` no longer adds `schedule` to the test
   kit's permission list: the kit has known it since filex v0.43.0.
+- Built against filex v0.49.0's guest SDK
+  (`github.com/brf-tech/filex/backend v0.49.0`, from the Go module proxy;
+  0.1.1 was built against v0.43.0). It carries `user_permissions`,
+  `requires` and `Actor.Can`, which this version needs.
 
 ## [0.1.1] — 2026-09-26
 
@@ -606,6 +610,7 @@ The MVP (M1) of the e-signature app for filex's app-plugin platform.
 - Host-side test harness (`internal/host.Fake` + throw-away CA) covering
   the whole flow without a wasm runtime.
 
-[Unreleased]: https://github.com/BRF-Tech/filex-sign/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/BRF-Tech/filex-sign/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/BRF-Tech/filex-sign/releases/tag/v0.2.0
 [0.1.1]: https://github.com/BRF-Tech/filex-sign/releases/tag/v0.1.1
 [0.1.0]: https://github.com/BRF-Tech/filex-sign/releases/tag/v0.1.0

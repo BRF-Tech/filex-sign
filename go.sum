@@ -1,5 +1,5 @@
-github.com/brf-tech/filex/backend v0.43.0 h1:6z+q7kkSlccoO66JuzJxPwUa2nqu+VBH07754FpVjbs=
-github.com/brf-tech/filex/backend v0.43.0/go.mod h1:ZskevmioLUUOPP8+eirwUFGbZwxXEQ/em3633PTJCp4=
+github.com/brf-tech/filex/backend v0.49.0 h1:aN3/X3Y2Sl1MBiBYEjZYEkXWuDQMt8w0zH0rEJ5S+qk=
+github.com/brf-tech/filex/backend v0.49.0/go.mod h1:ZskevmioLUUOPP8+eirwUFGbZwxXEQ/em3633PTJCp4=
 github.com/digitorus/pdf v0.2.0 h1:VTH4wOsVqIcV3CHeh8kahHDtvPmlK3jjRMIGhLXn4K4=
 github.com/digitorus/pdf v0.2.0/go.mod h1:hAVtI9P/OwJ4Hk+xoxxpLfBL3KHFpEFfcKMAnv02F80=
 github.com/digitorus/pdfsign v1.0.0-rc2 h1:7dSZ8RIBsTaSKug9ACpEMunzfSNf7sWtxxNEorVdGsc=

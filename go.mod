@@ -3,7 +3,7 @@ module github.com/brf-tech/filex-sign
 go 1.27.0
 
 require (
-	github.com/brf-tech/filex/backend v0.49.0
+	github.com/brf-tech/filex/backend v0.50.0
 	github.com/digitorus/pdf v0.2.0
 	github.com/digitorus/pdfsign v1.0.0-rc2
 	github.com/digitorus/pkcs7 v0.0.0-20260821105541-05f79448fa77

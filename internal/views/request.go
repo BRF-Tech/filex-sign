@@ -275,7 +275,7 @@ func requestStrip(l Lang, st RequestState) wire.Node {
 func Request(l Lang, doc Doc, st RequestState, labels []SignerLabel, errs map[string]wire.Text) *wire.Surface {
 	st = st.WithDefaults()
 	s := &wire.Surface{
-		Title:  Tf("Request signatures — %s", "İmza iste — %s", doc.Name),
+		Title:  Tf("Request signatures - %s", "İmza iste - %s", doc.Name),
 		Size:   "xl",
 		State:  StateOf(st),
 		Nodes:  []wire.Node{requestStrip(l, st)},
@@ -285,15 +285,15 @@ func Request(l Lang, doc Doc, st RequestState, labels []SignerLabel, errs map[st
 	case StepSigners:
 		s.Nodes = append(s.Nodes,
 			heading(T("Who has to sign?", "Kim imzalayacak?")),
-			text(T("Pick people from this filex — they sign inside it — or write the identity of somebody outside, who gets a private link. An identity is a name, an e-mail address, or both.",
-				"Bu filex kurulumundaki kişileri seçin — onlar buranın içinde imzalar — ya da dışarıdan birinin kimliğini yazın; ona özel bir bağlantı gider. Kimlik: ad, e-posta ya da ikisi.")),
+			text(T("Pick people from this filex - they sign inside it - or write the identity of somebody outside, who gets a private link. An identity is a name, an e-mail address, or both.",
+				"Bu filex kurulumundaki kişileri seçin - onlar buranın içinde imzalar - ya da dışarıdan birinin kimliğini yazın; ona özel bir bağlantı gider. Kimlik: ad, e-posta ya da ikisi.")),
 			wire.Node{ID: IDSigners, Type: "people-picker", Props: map[string]any{
 				"value": peopleProp(st.Signers), "multi": true, "allow_external": true}},
 			form([]wire.Field{
 				withHelp(withHintIn(longField(l, "identities", "Identity", "Kimlik"),
 					l, "Ali Yılmaz <ali@example.com>", "Ali Yılmaz <ali@ornek.com>"),
-					l, "One signer per line: a name, an e-mail address, or both. Somebody with no address still gets a link and a PIN — shown to YOU, to pass on by hand.",
-					"Her satıra bir imzacı: ad, e-posta ya da ikisi. Adresi olmayana da bağlantı ve PIN üretilir — SİZE gösterilir, elden iletirsiniz."),
+					l, "One signer per line: a name, an e-mail address, or both. Somebody with no address still gets a link and a PIN - shown to YOU, to pass on by hand.",
+					"Her satıra bir imzacı: ad, e-posta ya da ikisi. Adresi olmayana da bağlantı ve PIN üretilir - SİZE gösterilir, elden iletirsiniz."),
 			}, map[string]any{"identities": st.Identities}),
 		)
 		s.Nodes = append(s.Nodes, nameNotes(st.People())...)
@@ -303,8 +303,8 @@ func Request(l Lang, doc Doc, st RequestState, labels []SignerLabel, errs map[st
 	case StepOrder:
 		s.Nodes = append(s.Nodes,
 			heading(T("In what order?", "Hangi sırayla?")),
-			text(T("Everybody at once, or one after another in the order you listed them — the next person only hears from us when the one before has signed.",
-				"Hepsi aynı anda ya da listelediğiniz sırayla birer birer — sıradaki kişiye ancak bir öncekinin imzası gelince haber verilir.")),
+			text(T("Everybody at once, or one after another in the order you listed them - the next person only hears from us when the one before has signed.",
+				"Hepsi aynı anda ya da listelediğiniz sırayla birer birer - sıradaki kişiye ancak bir öncekinin imzası gelince haber verilir.")),
 			form([]wire.Field{
 				choice(l, "order", "Signing order", "İmza sırası", envelope.OrderParallel,
 					opt(l, envelope.OrderParallel, "Everybody at once", "Hepsi aynı anda"),
@@ -318,8 +318,8 @@ func Request(l Lang, doc Doc, st RequestState, labels []SignerLabel, errs map[st
 		// question here is the NAME the signer will be asked for.
 		s.Nodes = append(s.Nodes,
 			heading(T("What has to be filled in?", "Neler doldurulacak?")),
-			text(T("One box for every signature you need, and one for anything that has to be written. Give each box a name and say whose it is — that name is what the signer is asked for. Where they go is the next step.",
-				"Gereken her imza için bir kutu, yazılacak her şey için birer kutu. Her kutuya bir ad verin ve kimin olduğunu söyleyin — imzacıya sorulacak olan o addır. Yerlerini bir sonraki adımda seçeceksiniz.")),
+			text(T("One box for every signature you need, and one for anything that has to be written. Give each box a name and say whose it is - that name is what the signer is asked for. Where they go is the next step.",
+				"Gereken her imza için bir kutu, yazılacak her şey için birer kutu. Her kutuya bir ad verin ve kimin olduğunu söyleyin - imzacıya sorulacak olan o addır. Yerlerini bir sonraki adımda seçeceksiniz.")),
 			wire.Node{ID: IDFields, Type: "pdf-fields", Props: editorProps(l, doc, "define", st.Fields, labels)},
 		)
 		s.Nodes = append(s.Nodes, boxNameNotes(st.Fields)...)
@@ -351,11 +351,11 @@ func Request(l Lang, doc Doc, st RequestState, labels []SignerLabel, errs map[st
 			form([]wire.Field{
 				expiry,
 				withHelp(withHint(strField(l, "deadline", "Sign by (optional)", "Son imza tarihi (isteğe bağlı)"), "2026-12-31"),
-					l, "A day, as YYYY-MM-DD. The request closes when that day ends, and the links — and the freeze, if you set one — end with it.",
-					"Gün, YYYY-AA-GG biçiminde. İstek o gün bitince kapanır; bağlantılar — ve koyduysanız dondurma — onunla birlikte sona erer."),
+					l, "A day, as YYYY-MM-DD. The request closes when that day ends, and the links - and the freeze, if you set one - end with it.",
+					"Gün, YYYY-AA-GG biçiminde. İstek o gün bitince kapanır; bağlantılar - ve koyduysanız dondurma - onunla birlikte sona erer."),
 				withHelp(intField(l, "remind_every", "Remind the signers every (days)", "İmzacılara kaç günde bir hatırlatılsın", 0, 0, 60),
-					l, "0 means never. Otherwise a signer who has not signed hears from us again after that many quiet days, and again after as many more — sent by filex's hourly wake-up while the request is open, to everybody filex can write to. “Remind” in the Signatures panel still sends one whenever you like.",
-					"0 = hiç. Aksi hâlde imzalamamış bir imzacıya, o kadar gün ses çıkmayınca yeniden, sonra yine aynı aralıkla haber verilir — istek açık kaldıkça filex'in saatlik uyandırmasıyla, filex'in yazabildiği herkese. İmzalar panelindeki “Hatırlat” istediğiniz an bir tane daha gönderir."),
+					l, "0 means never. Otherwise a signer who has not signed hears from us again after that many quiet days, and again after as many more - sent by filex's hourly wake-up while the request is open, to everybody filex can write to. “Remind” in the Signatures panel still sends one whenever you like.",
+					"0 = hiç. Aksi hâlde imzalamamış bir imzacıya, o kadar gün ses çıkmayınca yeniden, sonra yine aynı aralıkla haber verilir - istek açık kaldıkça filex'in saatlik uyandırmasıyla, filex'in yazabildiği herkese. İmzalar panelindeki “Hatırlat” istediğiniz an bir tane daha gönderir."),
 			}, map[string]any{"expiry": o.ExpiryDays, "deadline": o.Deadline, "remind_every": o.RemindEveryDays}),
 		)
 		s.Actions = []wire.SurfaceAction{backButton(), nextButton()}
@@ -375,8 +375,8 @@ func Request(l Lang, doc Doc, st RequestState, labels []SignerLabel, errs map[st
 		fs = append(fs,
 			boolField(l, "allow_decline", "Let a signer refuse", "İmzacı reddedebilsin", DefaultAllowDecline),
 			withHelp(boolField(l, "lock", "Freeze the file while signatures are collected", "İmzalar toplanırken dosyayı dondur", false),
-				l, "Nobody — not even an administrator — can change the file until the request ends. Only this app's own signing writes into it.",
-				"İstek bitene kadar kimse — yönetici bile — dosyayı değiştiremez. Yalnız bu uygulamanın imzalaması yazabilir."),
+				l, "Nobody - not even an administrator - can change the file until the request ends. Only this app's own signing writes into it.",
+				"İstek bitene kadar kimse - yönetici bile - dosyayı değiştiremez. Yalnız bu uygulamanın imzalaması yazabilir."),
 			// ⚠⚠ The owner, 2026-09-22: after the last signature, "does the
 			// signature say so — or do we lock the file? Both." The PDF
 			// always says so (certified, sealed, its hash sent to every
@@ -384,8 +384,8 @@ func Request(l Lang, doc Doc, st RequestState, labels []SignerLabel, errs map[st
 			// what each answer means, because "lock" alone reads like the
 			// freeze above.
 			withHelp(boolField(l, "lock_signed", "Lock the signed file when every signature is in", "Her imza gelince imzalı dosyayı kilitle", false),
-				l, "Yes: once the last signature and filex's seal are in, the signed file is locked for good — nobody, not even an administrator, can change, move or delete it until an administrator lifts the lock on this app's page under Apps (lifting it is recorded). No: afterwards the signed file is an ordinary file. Either way the document is certified and sealed and every party is sent its SHA-256, so any later change shows.",
-				"Evet: son imza ve filex'in mührü eklenince imzalı dosya kalıcı olarak kilitlenir — bir yönetici kilidi Uygulamalar altındaki bu uygulamanın sayfasından kaldırana kadar (kaldırma kayda geçer) kimse, yönetici bile, onu değiştiremez, taşıyamaz ya da silemez. Hayır: bundan sonra imzalı dosya sıradan bir dosyadır. İki durumda da belge onaylanmış ve mühürlenmiştir ve her tarafa SHA-256 özeti gönderilir; sonradan yapılan her değişiklik görünür."),
+				l, "Yes: once the last signature and filex's seal are in, the signed file is locked for good - nobody, not even an administrator, can change, move or delete it until an administrator lifts the lock on this app's page under Apps (lifting it is recorded). No: afterwards the signed file is an ordinary file. Either way the document is certified and sealed and every party is sent its SHA-256, so any later change shows.",
+				"Evet: son imza ve filex'in mührü eklenince imzalı dosya kalıcı olarak kilitlenir - bir yönetici kilidi Uygulamalar altındaki bu uygulamanın sayfasından kaldırana kadar (kaldırma kayda geçer) kimse, yönetici bile, onu değiştiremez, taşıyamaz ya da silemez. Hayır: bundan sonra imzalı dosya sıradan bir dosyadır. İki durumda da belge onaylanmış ve mühürlenmiştir ve her tarafa SHA-256 özeti gönderilir; sonradan yapılan her değişiklik görünür."),
 			withHintIn(longField(l, "message", "A message to the signers (optional)", "İmzacılara mesaj (isteğe bağlı)"),
 				l, "Please sign by Friday.", "Lütfen cumaya kadar imzalayın."),
 		)
@@ -444,7 +444,7 @@ func reviewNodes(l Lang, st RequestState, labels []SignerLabel) []wire.Node {
 				typed++
 			}
 		}
-		turn := Plain("—")
+		turn := Plain("-")
 		if st.Opts.Order == envelope.OrderSequential {
 			turn = Plain(fmt.Sprintf("%d.", i+1))
 		}
@@ -487,7 +487,7 @@ func reviewNodes(l Lang, st RequestState, labels []SignerLabel) []wire.Node {
 	if anyDrawn+anyTyped > 0 {
 		rows = append(rows, row{ID: "anyone", Cells: map[string]wire.Text{
 			"who":   AnyoneWords(),
-			"turn":  Plain("—"),
+			"turn":  Plain("-"),
 			"how":   T("whoever of them signs first", "içlerinden ilk imzalayan"),
 			"boxes": BoxCount(anyDrawn, anyTyped),
 		}})

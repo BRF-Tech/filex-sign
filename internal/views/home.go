@@ -121,7 +121,6 @@ type HomeInput struct {
 	CAReason string
 	CAName   string
 	CAFP     string
-	Office   bool
 	// CanRequest: the reader holds the app's `request` permission, so
 	// "How this works" may tell them to "Request signatures…".
 	CanRequest bool
@@ -261,8 +260,8 @@ func Home(l Lang, in HomeInput) *wire.Surface {
 	case SectionAll:
 		s.Nodes = append(s.Nodes, section(l, T("Every request in this installation", "Bu kurulumdaki tüm istekler"),
 			in.All, T("No requests.", "İstek yok."), true, OpenFollow, T("Follow", "Takip et"))...)
-		s.Nodes = append(s.Nodes, muted(T("Only the documents you may see are listed — this screen never widens anybody's reach.",
-			"Yalnız görebileceğiniz belgeler listelenir — bu ekran kimsenin erişimini genişletmez.")))
+		s.Nodes = append(s.Nodes, muted(T("Only the documents you may see are listed - this screen never widens anybody's reach.",
+			"Yalnız görebileceğiniz belgeler listelenir - bu ekran kimsenin erişimini genişletmez.")))
 	default:
 		s.Nodes = append(s.Nodes, homeAbout(l, in)...)
 	}
@@ -277,10 +276,10 @@ func Home(l Lang, in HomeInput) *wire.Surface {
 // who can sign, and which authority signs.
 func homeAbout(l Lang, in HomeInput) []wire.Node {
 	start := T("Right-click a document → “Sign…” to sign it yourself. While a request is open the same menu offers “Sign / Fill” on that document. “Verify” is offered on every PDF, signed here or anywhere else.",
-		"Bir belgeye sağ tıklayın → kendiniz imzalamak için “İmzala…”. Bir istek açıkken aynı menü o belgede “İmzala / Doldur” gösterir. “Doğrula” her PDF'te vardır — burada imzalanmış olsun olmasın.")
+		"Bir belgeye sağ tıklayın → kendiniz imzalamak için “İmzala…”. Bir istek açıkken aynı menü o belgede “İmzala / Doldur” gösterir. “Doğrula” her PDF'te vardır - burada imzalanmış olsun olmasın.")
 	if in.CanRequest {
 		start = T("Right-click a document → “Sign…” to sign it yourself, or “Request signatures…” to ask others. While a request is open the same menu offers “Sign / Fill” on that document. “Verify” is offered on every PDF, signed here or anywhere else.",
-			"Bir belgeye sağ tıklayın → kendiniz imzalamak için “İmzala…”, başkalarından istemek için “İmza iste…”. Bir istek açıkken aynı menü o belgede “İmzala / Doldur” gösterir. “Doğrula” her PDF'te vardır — burada imzalanmış olsun olmasın.")
+			"Bir belgeye sağ tıklayın → kendiniz imzalamak için “İmzala…”, başkalarından istemek için “İmza iste…”. Bir istek açıkken aynı menü o belgede “İmzala / Doldur” gösterir. “Doğrula” her PDF'te vardır - burada imzalanmış olsun olmasın.")
 	}
 	n := []wire.Node{heading(T("How this works", "Bu nasıl çalışır")),
 		text(start),
@@ -293,13 +292,10 @@ func homeAbout(l Lang, in HomeInput) []wire.Node {
 	if in.CAFP != "" {
 		n = append(n, muted(Tf("Signing authority: %s · SHA-256 %s", "İmza makamı: %s · SHA-256 %s", in.CAName, in.CAFP)))
 	}
-	if in.Office {
-		n = append(n, muted(T("Office documents (ODT, DOCX, XLSX, PPTX…) are converted to PDF here before signing; the signed PDF is saved beside the original, which is never changed.",
-			"Ofis belgeleri (ODT, DOCX, XLSX, PPTX…) imzalanmadan önce burada PDF'e çevrilir; imzalı PDF aslının yanına kaydedilir, aslına dokunulmaz.")))
-	} else {
-		n = append(n, muted(T("This installation has no LibreOffice, so only PDFs can be signed. Convert an office document to PDF first.",
-			"Bu kurulumda LibreOffice yok, bu yüzden yalnız PDF imzalanabilir. Ofis belgesini önce PDF'e dönüştürün.")))
-	}
+	// ⚠ The same on every installation: this app converts nothing, so what
+	// it can sign does not depend on which engines the server has.
+	n = append(n, muted(T("Only PDFs can be signed. To sign an office document (DOCX, XLSX, ODT…), convert it to PDF first, with the Convert app or your office program, and sign the PDF.",
+		"Yalnız PDF imzalanabilir. Bir ofis belgesini (DOCX, XLSX, ODT…) imzalamak için önce Dönüştür uygulamasıyla ya da ofis programınızla PDF'e çevirin, sonra PDF'i imzalayın.")))
 	return n
 }
 
@@ -320,7 +316,7 @@ func section(l Lang, title wire.Text, cards []Card, empty wire.Text, live bool,
 			cells["state"] = Each(func(l Lang) string { return l.Sf("%s · frozen", "%s · dondurulmuş", In(state, l)) })
 		}
 		if c.Requester != "" {
-			cells["doc"] = Tf("%s — asked by %s", "%s — isteyen %s", c.Document, c.Requester)
+			cells["doc"] = Tf("%s - asked by %s", "%s - isteyen %s", c.Document, c.Requester)
 		}
 		rows = append(rows, row{ID: c.Path, Cells: cells,
 			Actions: []rowAction{{ID: action, Label: actionLabel}}})
@@ -382,8 +378,8 @@ func pinSection(l Lang, in HomeInput) []wire.Node {
 		rows = append(rows, row{ID: p.ID, Cells: cells, Actions: acts})
 	}
 	out := []wire.Node{
-		text(T("The PIN of a link never travels in the same message as the link — you hand it over. This is where you read it back.",
-			"Bir bağlantının PIN'i, bağlantıyla aynı mesajda gitmez — onu siz iletirsiniz. Buradan geri okuyabilirsiniz.")),
+		text(T("The PIN of a link never travels in the same message as the link - you hand it over. This is where you read it back.",
+			"Bir bağlantının PIN'i, bağlantıyla aynı mesajda gitmez - onu siz iletirsiniz. Buradan geri okuyabilirsiniz.")),
 		list([]column{
 			{Key: "doc", Label: T("Document", "Belge")},
 			{Key: "who", Label: T("Whose link", "Kimin bağlantısı")},
@@ -395,8 +391,8 @@ func pinSection(l Lang, in HomeInput) []wire.Node {
 	if p := in.Shown; p != nil && p.PIN != "" {
 		out = append(out, form([]wire.Field{
 			withHelp(labelled("pin", "string", In(p.Who, l)), l,
-				"Copy it and pass it on yourself — by a different route from the link. It is shown for this one answer; press “Show PIN” again whenever you need it, and every read is recorded.",
-				"Kopyalayıp kendiniz iletin — bağlantıdan farklı bir yoldan. Yalnız bu cevapta görünür; gerektikçe yeniden “PIN'i göster” deyin, her okuma kayda geçer."),
+				"Copy it and pass it on yourself - by a different route from the link. It is shown for this one answer; press “Show PIN” again whenever you need it, and every read is recorded.",
+				"Kopyalayıp kendiniz iletin - bağlantıdan farklı bir yoldan. Yalnız bu cevapta görünür; gerektikçe yeniden “PIN'i göster” deyin, her okuma kayda geçer."),
 		}, map[string]any{"pin": p.PIN}))
 	}
 	if p := in.Shown; p != nil && p.Reason != "" {
@@ -455,7 +451,7 @@ func PinLinksOf(env *envelope.Envelope, path, document string, now time.Time) ([
 	if env.DeliveryToken != "" {
 		live := !past(env.DeliveryExpires, now)
 		add("delivery", "", PinLink{
-			Who:    T("everybody — the signed file", "herkes — imzalı dosya"),
+			Who:    T("everybody - the signed file", "herkes - imzalı dosya"),
 			Kind:   T("download link", "indirme bağlantısı"),
 			State:  linkState(T("Sent", "Gönderildi"), live, !live),
 			Live:   live,
@@ -507,8 +503,8 @@ func pinReasonWords(reason string) wire.Text {
 // pinRemedy is what DOES work, said next to what does not.
 func pinRemedy(reason string) wire.Text {
 	if reason == "no_secret_key" {
-		return T("An administrator has not given this installation a secret key, so no PIN it mints can ever be read back. Until they do, note a PIN down when the request is sent — it is in the job's message and in your bell.",
-			"Yönetici bu kuruluma bir gizli anahtar vermemiş; bu yüzden ürettiği hiçbir PIN geri okunamaz. Verilene kadar PIN'i istek gönderilirken not edin — iş mesajında ve bildiriminizde yazar.")
+		return T("An administrator has not given this installation a secret key, so no PIN it mints can ever be read back. Until they do, note a PIN down when the request is sent - it is in the job's message and in your bell.",
+			"Yönetici bu kuruluma bir gizli anahtar vermemiş; bu yüzden ürettiği hiçbir PIN geri okunamaz. Verilene kadar PIN'i istek gönderilirken not edin - iş mesajında ve bildiriminizde yazar.")
 	}
 	return T("The link still works; only its PIN is gone. Cancel the request and send it again to get a link with a PIN you can read, or reach the person another way.",
 		"Bağlantı hâlâ çalışıyor; yalnız PIN'i kayıp. Okuyabileceğiniz bir PIN için isteği iptal edip yeniden gönderin ya da kişiye başka bir yoldan ulaşın.")
@@ -516,7 +512,7 @@ func pinRemedy(reason string) wire.Text {
 
 func orDash(s string) string {
 	if s == "" {
-		return "—"
+		return "-"
 	}
 	return s
 }
@@ -534,16 +530,16 @@ func orDash(s string) string {
 func SigningUnavailable(reason string) wire.Text {
 	switch r := strings.ToLower(reason); {
 	case strings.Contains(r, "filex_secret_key"):
-		return T("the server has no FILEX_SECRET_KEY, which signing needs — an administrator sets it and restarts filex",
-			"sunucuda imzalamanın gerektirdiği FILEX_SECRET_KEY ayarlı değil — bir yönetici ayarlayıp filex'i yeniden başlatmalı")
+		return T("the server has no FILEX_SECRET_KEY, which signing needs - an administrator sets it and restarts filex",
+			"sunucuda imzalamanın gerektirdiği FILEX_SECRET_KEY ayarlı değil - bir yönetici ayarlayıp filex'i yeniden başlatmalı")
 	case strings.Contains(r, "permission"):
-		return T("this app was not granted signing — an administrator reviews its permissions",
-			"bu uygulamaya imzalama izni verilmemiş — bir yönetici izinlerini gözden geçirmeli")
+		return T("this app was not granted signing - an administrator reviews its permissions",
+			"bu uygulamaya imzalama izni verilmemiş - bir yönetici izinlerini gözden geçirmeli")
 	case r == "" || strings.Contains(r, "not enabled"):
 		return T("an administrator has not enabled signing", "bir yönetici imzalamayı henüz etkinleştirmedi")
 	}
-	return T("the server could not provide a signing authority — the reason is in the app's log",
-		"sunucu bir imza makamı sağlayamadı — sebebi uygulamanın günlüğünde")
+	return T("the server could not provide a signing authority - the reason is in the app's log",
+		"sunucu bir imza makamı sağlayamadı - sebebi uygulamanın günlüğünde")
 }
 
 // ErrWords names a host error code (pluginkit.HostError.Code) for a person.
@@ -560,11 +556,11 @@ func ErrWords(code string) wire.Text {
 	case "timeout":
 		return T("it took too long", "zaman aşımına uğradı")
 	case "unavailable":
-		return T("the service is not available here — mail may not be set up", "hizmet burada kullanılamıyor — e-posta ayarlanmamış olabilir")
+		return T("the service is not available here - mail may not be set up", "hizmet burada kullanılamıyor - e-posta ayarlanmamış olabilir")
 	case "busy", "rate_limited":
-		return T("too many attempts — try again later", "çok sık denendi — biraz sonra yeniden deneyin")
+		return T("too many attempts - try again later", "çok sık denendi - biraz sonra yeniden deneyin")
 	case "invalid":
 		return T("the request was refused as invalid", "istek geçersiz sayılıp reddedildi")
 	}
-	return T("an unexpected error — the details are in the app's log", "beklenmeyen bir hata — ayrıntı uygulamanın günlüğünde")
+	return T("an unexpected error - the details are in the app's log", "beklenmeyen bir hata - ayrıntı uygulamanın günlüğünde")
 }

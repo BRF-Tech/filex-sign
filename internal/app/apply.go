@@ -274,8 +274,8 @@ func (a *App) opRemind(ref string, env *envelope.Envelope, signerID string, sche
 			"%s zaten yanıt vermiş; hatırlatmaya gerek kalmadı.", sg.Person.Identity())}, nil
 	}
 	if !sg.Internal() && !sg.Person.HasEmail() {
-		return failf("%s has no address for filex to write to — pass their link on yourself: %s",
-			"%s için filex'in yazabileceği bir adres yok — bağlantısını kendiniz iletin: %s", sg.Person.Identity(), sg.PageURL)
+		return failf("%s has no address for filex to write to - pass their link on yourself: %s",
+			"%s için filex'in yazabileceği bir adres yok - bağlantısını kendiniz iletin: %s", sg.Person.Identity(), sg.PageURL)
 	}
 	next, _, err := envelope.Apply(*env, envelope.Input{Type: envelope.EvReminded, Signer: signerID, At: a.H.Now()})
 	if err != nil {
@@ -376,7 +376,7 @@ func (a *App) opSign(in *wire.ActionRunInput, ref string, env *envelope.Envelope
 	}
 	l := views.Of(in.Locale)
 	a.step(in.Locale, 1, 5, "reading the document", "belge okunuyor")
-	doc, err := a.openDocument(in.Locale, ref, env.Document)
+	doc, err := a.openDocument(ref)
 	if err != nil {
 		return failText(a.intakeWords(err, env.Document))
 	}
@@ -447,7 +447,7 @@ func (a *App) opSign(in *wire.ActionRunInput, ref string, env *envelope.Envelope
 		final = seal.Out
 	}
 	a.step(in.Locale, 3, 5, "saving the signed document", "imzalı belge kaydediliyor")
-	outRef, outName, err := a.writeSigned(in, doc, out, final)
+	outRef, outName, err := a.writeSigned(in, out, final)
 	if err != nil {
 		return nil, err
 	}

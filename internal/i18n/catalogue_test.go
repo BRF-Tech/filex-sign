@@ -539,6 +539,94 @@ func contains(list []string, s string) bool {
 	return false
 }
 
+// longDashes are the characters the owner's standing rule keeps out of
+// everything a person reads (2026-10-02, "no long dash in any visible
+// text"): the em dash, the en dash, the Unicode hyphens, the figure dash,
+// the horizontal bar and the minus sign. Each is written as a plain "-".
+// (Numbers, not the characters: an invisible U+2011 in this file would be
+// its own trap.)
+var longDashes = []rune{0x2014, 0x2013, 0x2010, 0x2011, 0x2012, 0x2015, 0x2212}
+
+// dashesIn names the long dashes s carries ("U+2014 U+2013"), "" for none.
+func dashesIn(s string) string {
+	var found []string
+	for _, d := range longDashes {
+		if strings.ContainsRune(s, d) {
+			found = append(found, fmt.Sprintf("U+%04X", d))
+		}
+	}
+	return strings.Join(found, " ")
+}
+
+// ⚠⚠ No long dash anywhere a person reads. A text call is not the only
+// way words reach somebody: a sentence is also put together around one
+// (a separator, a placeholder for "nothing", a date range), and an error's
+// words can end up on a job's answer. So this holds EVERY string and rune
+// literal of the module's code (tests excluded), every key and value of
+// the es/de/fr catalogues, and every string of filex-app.json. Before
+// 2026-10-02 the app carried 158 such literals, 74 catalogue keys and 23
+// manifest texts with one.
+func TestCatalogue_NoLongDashAnywhereAPersonReads(t *testing.T) {
+	s := readModule(t)
+	if len(s.files) < 20 {
+		t.Fatalf("only %d source files read; the scan is not reading the module", len(s.files))
+	}
+	for path, f := range s.files {
+		ast.Inspect(f, func(n ast.Node) bool {
+			lit, ok := n.(*ast.BasicLit)
+			if !ok || (lit.Kind != token.STRING && lit.Kind != token.CHAR) {
+				return true
+			}
+			v, err := strconv.Unquote(lit.Value)
+			if err != nil {
+				return true
+			}
+			if bad := dashesIn(v); bad != "" {
+				p := s.fset.Position(lit.Pos())
+				rel, _ := filepath.Rel(root, path)
+				t.Errorf("%s:%d: %s in %q; write a plain \"-\"", filepath.ToSlash(rel), p.Line, bad, v)
+			}
+			return true
+		})
+	}
+	for _, l := range Catalogued() {
+		for en, v := range Entries(l) {
+			if bad := dashesIn(en); bad != "" {
+				t.Errorf("catalogue/%s.json: the key %q carries %s", l, en, bad)
+			}
+			if bad := dashesIn(v); bad != "" {
+				t.Errorf("catalogue/%s.json: %q carries %s (for %q)", l, v, bad, en)
+			}
+		}
+	}
+	raw, err := os.ReadFile(filepath.Join(root, "filex-app.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var m any
+	if err := json.Unmarshal(raw, &m); err != nil {
+		t.Fatal(err)
+	}
+	var walk func(path string, v any)
+	walk = func(path string, v any) {
+		switch x := v.(type) {
+		case string:
+			if bad := dashesIn(x); bad != "" {
+				t.Errorf("filex-app.json%s: %s in %q", path, bad, x)
+			}
+		case map[string]any:
+			for k, e := range x {
+				walk(path+"."+k, e)
+			}
+		case []any:
+			for i, e := range x {
+				walk(fmt.Sprintf("%s[%d]", path, i), e)
+			}
+		}
+	}
+	walk("", m)
+}
+
 // The validator itself must fail on what it exists to catch.
 func TestCatalogue_TheCheckerCatchesWhatItIsFor(t *testing.T) {
 	if a, b := strings.Join(verbs("%s signed (%d/%d)"), ","), strings.Join(verbs("%s hat unterschrieben (%d/%d)"), ","); a != b {
@@ -561,5 +649,13 @@ func TestCatalogue_TheCheckerCatchesWhatItIsFor(t *testing.T) {
 	}
 	if l, tr := edges("Rechazó"); l != "" || tr != "" {
 		t.Fatalf("a multi-byte last rune is not whitespace: %q %q", l, tr)
+	}
+	for _, d := range longDashes {
+		if dashesIn("a "+string(d)+" b") == "" {
+			t.Fatalf("U+%04X must be caught", d)
+		}
+	}
+	if dashesIn("e-mail: a-b, 1-3, -5") != "" {
+		t.Fatal("a plain hyphen-minus is the dash to write, never a finding")
 	}
 }

@@ -90,8 +90,8 @@ func Receipt(l Lang, in ReceiptInput) *wire.Surface {
 
 	s.Nodes = append(s.Nodes, divider(), heading(T("How to check it later", "Sonradan nasıl doğrularsınız")))
 	if in.InApp {
-		s.Nodes = append(s.Nodes, text(T("Right-click the document in filex and choose “Verify”: the report names every signature, the authority behind it, and the same fingerprints you see here — compare them line by line.",
-			"filex'te belgeye sağ tıklayıp “Doğrula” deyin: rapor her imzayı, arkasındaki makamı ve burada gördüğünüz parmak izlerinin aynısını listeler — satır satır karşılaştırın.")))
+		s.Nodes = append(s.Nodes, text(T("Right-click the document in filex and choose “Verify”: the report names every signature, the authority behind it, and the same fingerprints you see here - compare them line by line.",
+			"filex'te belgeye sağ tıklayıp “Doğrula” deyin: rapor her imzayı, arkasındaki makamı ve burada gördüğünüz parmak izlerinin aynısını listeler - satır satır karşılaştırın.")))
 	} else {
 		s.Nodes = append(s.Nodes, text(T("Open the signed PDF in a reader that checks signatures (Adobe Acrobat Reader, Okular, Firefox's PDF viewer). Import the authority certificate above once, and the signature shows as valid. Compare the certificate fingerprint the reader shows with the one on this page: if they match, the signature in that file is the one you made.",
 			"İmzalı PDF'i imza denetleyen bir okuyucuda açın (Adobe Acrobat Reader, Okular, Firefox'un PDF görüntüleyicisi). Yukarıdaki makam sertifikasını bir kez içe aktarın, imza geçerli görünsün. Okuyucunun gösterdiği sertifika parmak izini bu sayfadakiyle karşılaştırın: aynıysa o dosyadaki imza sizin attığınız imzadır.")))
@@ -103,6 +103,6 @@ func Receipt(l Lang, in ReceiptInput) *wire.Surface {
 // ReceiptSentence is the sentence that has to appear on every surface
 // and in every file of the receipt, in the same words.
 func ReceiptSentence(l Lang) wire.Text {
-	return T("This is an identity receipt, not a signing capability: it proves who signed and what was signed, and it cannot sign anything. The private key that made your signature was destroyed the moment the signature was written, so nobody — not you, not this installation — can sign something new with it.",
-		"Bu bir kimlik makbuzudur, imza yeteneği değildir: kimin neyi imzaladığını kanıtlar, kendisiyle hiçbir şey imzalanamaz. İmzanızı üreten özel anahtar imza yazılır yazılmaz yok edildi; onunla kimse — ne siz ne de bu kurulum — yeni bir şey imzalayamaz.")
+	return T("This is an identity receipt, not a signing capability: it proves who signed and what was signed, and it cannot sign anything. The private key that made your signature was destroyed the moment the signature was written, so nobody - not you, not this installation - can sign something new with it.",
+		"Bu bir kimlik makbuzudur, imza yeteneği değildir: kimin neyi imzaladığını kanıtlar, kendisiyle hiçbir şey imzalanamaz. İmzanızı üreten özel anahtar imza yazılır yazılmaz yok edildi; onunla kimse - ne siz ne de bu kurulum - yeni bir şey imzalayamaz.")
 }

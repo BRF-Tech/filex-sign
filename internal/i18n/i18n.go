@@ -162,7 +162,7 @@ func (w When) inLang(l Lang) string { return humandate.DayTime(string(l), time.T
 type Span struct{ From, To time.Time }
 
 func (s Span) inLang(l Lang) string {
-	return humandate.Day(string(l), s.From) + " – " + humandate.Day(string(l), s.To)
+	return humandate.Day(string(l), s.From) + " - " + humandate.Day(string(l), s.To)
 }
 
 // DayText is a stamp's day as a table cell, in every language.

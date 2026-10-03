@@ -128,7 +128,7 @@ func Status(l Lang, in StatusInput) *wire.Surface {
 	var rows []row
 	for _, sg := range env.Signers {
 		signs := env.Signs(sg.ID)
-		cells := map[string]wire.Text{"who": Plain(sg.Person.Display()), "state": ActWords(sg.Status, signs), "when": Plain("—")}
+		cells := map[string]wire.Text{"who": Plain(sg.Person.Display()), "state": ActWords(sg.Status, signs), "when": Plain("-")}
 		switch {
 		case sg.SignedAt != "":
 			cells["when"] = DayText(sg.SignedAt)
@@ -174,15 +174,15 @@ func Status(l Lang, in StatusInput) *wire.Surface {
 		if sg := env.Signer(in.ShowLinkFor); sg != nil && sg.PageURL != "" {
 			s.Nodes = append(s.Nodes, form([]wire.Field{
 				withHelp(labelledf(l, "link", "string", "Link for %s", "%s için bağlantı", sg.Person.Identity()), l,
-					"Copy it and send it yourself. The PIN, if one was set, was shown when the request was sent (the job message and the bell) — it is never in a mail.",
-					"Kopyalayıp kendiniz iletin. PIN koyduysanız, istek gönderilirken gösterildi (iş mesajı ve bildirim) — e-postada asla olmaz."),
+					"Copy it and send it yourself. The PIN, if one was set, was shown when the request was sent (the job message and the bell) - it is never in a mail.",
+					"Kopyalayıp kendiniz iletin. PIN koyduysanız, istek gönderilirken gösterildi (iş mesajı ve bildirim) - e-postada asla olmaz."),
 			}, map[string]any{"link": sg.PageURL}))
 		}
 	}
 	if sg := declinedSigner(env); sg != nil {
 		reason := sg.DeclineReason
 		if reason == "" {
-			reason = "—"
+			reason = "-"
 		}
 		s.Nodes = append(s.Nodes, danger(Tf("%s refused: %s", "%s reddetti: %s", sg.Person.Identity(), reason)))
 	}
@@ -204,8 +204,8 @@ func Status(l Lang, in StatusInput) *wire.Surface {
 	if env.DeliveryURL != "" {
 		s.Nodes = append(s.Nodes, form([]wire.Field{
 			withHelp(strField(l, "delivery", "Link the signers were sent", "İmzacılara gönderilen bağlantı"), l,
-				"The signed document as a filex share. Anybody without an address got nothing — pass this on to them.",
-				"İmzalı belge, filex paylaşımı olarak. Adresi olmayanlara gönderilmedi — onlara bunu siz iletin."),
+				"The signed document as a filex share. Anybody without an address got nothing - pass this on to them.",
+				"İmzalı belge, filex paylaşımı olarak. Adresi olmayanlara gönderilmedi - onlara bunu siz iletin."),
 		}, map[string]any{"delivery": env.DeliveryURL}))
 	}
 	if in.SignaturesInFile > 0 {
@@ -218,8 +218,8 @@ func Status(l Lang, in StatusInput) *wire.Surface {
 	if env.Status == envelope.StatusCompleted && env.Options.Audit && env.Options.Output.Normalized().Mode != envelope.OutputSibling {
 		// The signed file went in as a new version, and one job commits one
 		// kind of output, so the trail is a click rather than a surprise.
-		s.Nodes = append(s.Nodes, muted(T("An audit trail — who was asked, what each of them did, when, and with which certificate — can be written beside the document.",
-			"Denetim izi — kimden istendi, her biri ne yaptı, ne zaman, hangi sertifikayla — belgenin yanına yazılabilir.")))
+		s.Nodes = append(s.Nodes, muted(T("An audit trail - who was asked, what each of them did, when, and with which certificate - can be written beside the document.",
+			"Denetim izi - kimden istendi, her biri ne yaptı, ne zaman, hangi sertifikayla - belgenin yanına yazılabilir.")))
 		s.Actions = append(s.Actions, button("audit", T("Save the audit trail", "Denetim izini kaydet")))
 	}
 	if !env.Status.Closed() {

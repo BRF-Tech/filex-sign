@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"strings"
@@ -13,6 +14,7 @@ import (
 	"github.com/brf-tech/filex-sign/internal/fields"
 	"github.com/brf-tech/filex-sign/internal/fontkit"
 	"github.com/brf-tech/filex-sign/internal/pdfdoc"
+	"github.com/brf-tech/filex-sign/internal/pdfsig"
 	"github.com/brf-tech/filex-sign/internal/views"
 )
 
@@ -46,13 +48,14 @@ func (a *App) actionRequest(in *wire.ActionRunInput) (*wire.ActionRunOutput, err
 		}
 	}
 	a.step(in.Locale, 1, 5, "reading the document", "belge okunuyor")
-	doc, err := a.openDocument(in.Locale, ref, in.Inputs[0].Name)
+	doc, err := a.openDocument(ref)
 	if err != nil {
+		// A document that is not a PDF is refused HERE, before the freeze,
+		// the links and the notices: nothing about a request exists yet.
+		if errors.Is(err, pdfsig.ErrNotPDF) {
+			return failText(views.NotPDFRequestWords(in.Inputs[0].Name))
+		}
 		return failText(a.intakeWords(err, in.Inputs[0].Name))
-	}
-	if doc.Converted() {
-		return failf("“%s” is not a PDF. Convert it first — “Sign…” offers that — and ask for signatures on the PDF, where the boxes can be placed.",
-			"“%s” bir PDF değil. Önce dönüştürün — “İmzala…” bunu sunar — ve kutuların yerleştirilebildiği PDF üzerinde imza isteyin.", in.Inputs[0].Name)
 	}
 
 	people := parsePeople(in.Params["signers"])
@@ -355,8 +358,8 @@ func everybodyHasSomething(env *envelope.Envelope) wire.Text {
 		}
 	}
 	if len(names) > spare {
-		return views.Tf("These people have nothing to do on the document. Give each of them a box — a signature or something to fill in — or take them off: %s",
-			"Şu kişilerin belgede yapacağı bir şey yok. Her birine bir kutu verin — imza ya da doldurulacak bir şey — ya da onları listeden çıkarın: %s",
+		return views.Tf("These people have nothing to do on the document. Give each of them a box - a signature or something to fill in - or take them off: %s",
+			"Şu kişilerin belgede yapacağı bir şey yok. Her birine bir kutu verin - imza ya da doldurulacak bir şey - ya da onları listeden çıkarın: %s",
 			strings.Join(names, ", "))
 	}
 	return nil

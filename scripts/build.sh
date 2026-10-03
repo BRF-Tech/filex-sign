@@ -42,7 +42,7 @@ fi
 
 # 22 MB since 0.1.0's fonts (2026-09-21): the module grew from 17.3 to
 # 20.6 MB
-# rules and the script tables — which is what makes Arabic letters join and
+# rules and the script tables - which is what makes Arabic letters join and
 # Devanagari conjuncts form. The FONTS add nothing: they are fetched on
 # demand (fontkit/noto.go). An install compiles the module once; measure
 # that time again before raising this further.
@@ -76,7 +76,7 @@ PY
 # ⚠ The copy is whichever directory go.mod's `replace` names; its name follows
 # the filex release it was generated for. This used to ask ../filex-sdk-dev by
 # name and skip the check in silence when that directory was not there, or
-# when node was not on PATH — a guard that goes quiet exactly when it is
+# when node was not on PATH - a guard that goes quiet exactly when it is
 # needed. A replace with no check (or no node) beside it refuses.
 SDK_COPY="$(sed -n 's#^replace github.com/brf-tech/filex/backend => \(\.[^ ]*\)[[:space:]]*$#\1#p' go.mod)"
 if [ -n "$SDK_COPY" ]; then

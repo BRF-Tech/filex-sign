@@ -26,40 +26,21 @@ import (
 	"github.com/brf-tech/filex-sign/internal/views"
 )
 
-// ── intake: the document, converted to PDF when it is not one ──────────
-
-// OfficeExts are the documents the plugin will convert before signing.
-// They are also the manifest's `applies.ext` beyond "pdf"; a test keeps
-// the two lists identical.
-var OfficeExts = []string{
-	"odt", "ott", "ods", "odp", "odg", "fodt", "rtf",
-	"doc", "docx", "dot", "dotx", "xls", "xlsx", "ppt", "pptx", "txt",
-}
-
-// ErrNoOffice is the refusal when the document needs LibreOffice and
-// this instance has none.
-var ErrNoOffice = errors.New("libreoffice is not installed on this filex")
-
-// convertError is LibreOffice running and not making a PDF: it failed, or
-// it ran out of time. detail is its own (English) words, for the log.
-type convertError struct {
-	detail  string
-	timeout bool
-}
-
-func (e *convertError) Error() string { return "libreoffice produced no PDF (" + e.detail + ")" }
+// ── intake: the document, which has to be a PDF ────────────────────────
+//
+// ⚠⚠ The owner, 2026-10-02: an office document is not signed here, and is
+// not converted here either. Turning a DOCX into a PDF is the Convert app's
+// work; this app signs PDFs and needs no engine of any kind. It used to run
+// LibreOffice itself (engines:libreoffice, a hidden `convert` action, a
+// "Convert to PDF" screen), which made signing depend on a converter; that
+// is gone. A document that is not a PDF is refused in words that say what
+// to do instead (views.NotPDFWords).
 
 // document is the PDF a job works on.
 type document struct {
 	Bytes []byte
 	Info  *pdfsig.Info
-	// Source is the office file the PDF was made from, empty when the
-	// input already was a PDF.
-	Source string
 }
-
-// Converted reports whether the bytes came out of LibreOffice.
-func (d *document) Converted() bool { return d.Source != "" }
 
 func extOf(name string) string {
 	if i := strings.LastIndex(name, "."); i >= 0 && i < len(name)-1 {
@@ -68,84 +49,22 @@ func extOf(name string) string {
 	return ""
 }
 
-func isOfficeExt(ext string) bool {
-	for _, e := range OfficeExts {
-		if e == ext {
-			return true
-		}
-	}
-	return false
-}
-
-// openDocument reads the input and hands back a PDF: the file itself
-// when it is one, LibreOffice's rendering of it when it is an office
-// document.
-func (a *App) openDocument(locale, ref, name string) (*document, error) {
+// openDocument reads the input and hands it back when it is a PDF. It
+// goes by what the bytes are, not by the name: a PDF without the
+// extension is still signed, and a .docx is refused whatever it carries.
+func (a *App) openDocument(ref string) (*document, error) {
 	raw, err := a.H.ReadInput(ref)
 	if err != nil {
 		return nil, err
 	}
-	if bytes.HasPrefix(bytes.TrimLeft(raw, "\xef\xbb\xbf \r\n\t"), []byte("%PDF-")) {
-		info, err := pdfsig.Inspect(raw)
-		if err != nil {
-			return nil, err
-		}
-		return &document{Bytes: raw, Info: info}, nil
-	}
-	ext := extOf(name)
-	if !isOfficeExt(ext) {
+	if !bytes.HasPrefix(bytes.TrimLeft(raw, "\xef\xbb\xbf \r\n\t"), []byte("%PDF-")) {
 		return nil, pdfsig.ErrNotPDF
 	}
-	if !a.H.EngineAvailable(officeEngine) {
-		return nil, ErrNoOffice
-	}
-	a.step(locale, 1, 5, "converting %s to PDF", "%s belgesi PDF'e çevriliyor", name)
-	pdfBytes, err := a.convert(ref, ext)
+	info, err := pdfsig.Inspect(raw)
 	if err != nil {
 		return nil, err
 	}
-	info, err := pdfsig.Inspect(pdfBytes)
-	if err != nil {
-		return nil, err
-	}
-	return &document{Bytes: pdfBytes, Info: info, Source: name}, nil
-}
-
-// convert runs LibreOffice in its private run directory. Every argument
-// is a bare token, which is what the host's engine rule demands: the
-// file is staged as `in.<ext>` and comes back as `in.pdf`.
-func (a *App) convert(ref, ext string) ([]byte, error) {
-	inName := "in." + ext
-	res, err := a.H.EngineRun(pluginkit.EngineRequest{
-		Engine: officeEngine, Args: []string{"--convert-to", "pdf", inName},
-		Inputs: map[string]string{inName: ref}, Outputs: []string{"in.pdf"}, TimeoutS: convertTimeoutS,
-	})
-	if err != nil {
-		var he *pluginkit.HostError
-		if errors.As(err, &he) {
-			switch he.Code {
-			case wire.ErrUnavailable:
-				// The engine went away between the screen and the job.
-				return nil, ErrNoOffice
-			case wire.ErrTimeout:
-				return nil, &convertError{detail: err.Error(), timeout: true}
-			}
-		}
-		return nil, &convertError{detail: err.Error()}
-	}
-	for _, o := range res.Outputs {
-		if o.Name == "in.pdf" {
-			return a.H.ReadInput(o.Ref)
-		}
-	}
-	tail := strings.TrimSpace(res.StderrTail)
-	if tail == "" {
-		tail = strings.TrimSpace(res.StdoutTail)
-	}
-	if tail == "" {
-		tail = fmt.Sprintf("exit %d", res.Exit)
-	}
-	return nil, &convertError{detail: clip(tail, 160)}
+	return &document{Bytes: raw, Info: info}, nil
 }
 
 // intakeWords turns a refusal into words the person can act on.
@@ -154,30 +73,17 @@ func (a *App) convert(ref, ext string) ([]byte, error) {
 // into a Turkish sentence ("Belge okunamadı: libreoffice produced no PDF
 // (exit 1)"). The error itself goes to the app's log.
 func (a *App) intakeWords(err error, name string) wire.Text {
-	var ce *convertError
 	switch {
-	case errors.As(err, &ce):
-		a.logf("warn", "converting %s: %v", name, err)
-		if ce.timeout {
-			return views.Tf("LibreOffice took too long to turn “%s” into a PDF. Try again, or convert it to PDF yourself and sign that.",
-				"LibreOffice “%s” belgesini zamanında PDF'e çeviremedi. Yeniden deneyin ya da kendiniz PDF'e çevirip onu imzalayın.", name)
-		}
-		return views.Tf("LibreOffice could not turn “%s” into a PDF — it may be damaged or password-protected. Convert it to PDF yourself and sign that.",
-			"LibreOffice “%s” belgesini PDF'e çeviremedi — belge bozuk ya da parola korumalı olabilir. Kendiniz PDF'e çevirip onu imzalayın.", name)
-	case errors.Is(err, ErrNoOffice):
-		return views.Tf("This filex has no LibreOffice, so “%s” cannot be turned into a PDF to sign. Convert it to PDF first (the Convert app, or your office suite) and sign that.",
-			"Bu filex kurulumunda LibreOffice yok, bu yüzden “%s” imzalanmak üzere PDF'e çevrilemiyor. Önce PDF'e dönüştürün (Dönüştür uygulaması ya da ofis programınız) ve onu imzalayın.", name)
 	case errors.Is(err, pdfsig.ErrEncrypted):
 		return views.T("The PDF is password-protected. Remove the password and try again.", "PDF parola korumalı. Parolayı kaldırıp yeniden deneyin.")
 	case errors.Is(err, pdfsig.ErrXFA):
 		return views.T("This is an XFA form, which cannot be signed. Flatten it to a plain PDF first.", "Bu bir XFA formu; imzalanamaz. Önce düz PDF'e dönüştürün.")
 	case errors.Is(err, pdfsig.ErrNotPDF):
-		return views.Tf("“%s” is not a document this app can sign. Convert it to PDF first.",
-			"“%s” bu uygulamanın imzalayabileceği bir belge değil. Önce PDF'e dönüştürün.", name)
+		return views.NotPDFWords(name)
 	}
 	a.logf("warn", "reading %s: %v", name, err)
-	return views.Tf("“%s” could not be read — it may be damaged, or not a kind of document this app can read.",
-		"“%s” okunamadı — bozuk olabilir ya da bu uygulamanın okuyabildiği türden bir belge değil.", name)
+	return views.Tf("“%s” could not be read - it may be damaged, or not a kind of document this app can read.",
+		"“%s” okunamadı - bozuk olabilir ya da bu uygulamanın okuyabildiği türden bir belge değil.", name)
 }
 
 // ── shared: one signature by one person ────────────────────────────────
@@ -560,7 +466,7 @@ func initialsOf(name string) string {
 		b.WriteString(strings.ToUpper(string(r[0])))
 	}
 	if b.Len() == 0 {
-		return "—"
+		return "-"
 	}
 	return b.String()
 }
@@ -783,21 +689,12 @@ func outputOf(in *wire.ActionRunInput, fallback envelope.Output) envelope.Output
 }
 
 // writeSigned writes the signed PDF under the name the effective output
-// asks for, and refuses the one combination that would destroy data: a
-// converted office document cannot become a new version of its original.
-func (a *App) writeSigned(in *wire.ActionRunInput, doc *document, out envelope.Output, body []byte) (wire.OutputRef, string, error) {
+// asks for.
+func (a *App) writeSigned(in *wire.ActionRunInput, out envelope.Output, body []byte) (wire.OutputRef, string, error) {
 	inputName := in.Inputs[0].Name
-	if out.Mode == envelope.OutputVersion && doc.Converted() {
-		return wire.OutputRef{}, "", errors.New("version-of-office")
-	}
 	name := inputName
 	if out.Mode == envelope.OutputSibling {
 		name = expandName(out.Name, inputName)
-		// A converted document is a PDF whatever the pattern said, so the
-		// name never keeps the office extension it came from.
-		if doc.Converted() && !strings.HasSuffix(strings.ToLower(name), ".pdf") {
-			name = stem(name) + ".pdf"
-		}
 	}
 	ref, err := a.H.WriteOutput(name, body)
 	return ref, name, err
@@ -809,25 +706,25 @@ func (a *App) actionSign(in *wire.ActionRunInput) (*wire.ActionRunOutput, error)
 	if len(in.Inputs) == 0 {
 		return fail("No document was given.", "Belge verilmedi.")
 	}
+	// A `sign` job with op=convert is what a "Convert to PDF" screen before
+	// 0.1.1 queued. This app converts nothing any more; such a job, still in
+	// a queue across the upgrade, is answered in words instead of signing
+	// something nobody placed a box on.
 	if str(in.Params, "op") == "convert" {
-		return a.opConvert(in)
+		return failText(views.NotPDFWords(in.Inputs[0].Name))
 	}
 	if reason, ok := a.signingReady(); !ok {
 		return failf("Signing is not available: %s", "İmzalama kullanılamıyor: %s", views.SigningUnavailable(reason))
 	}
 	l := views.Of(in.Locale)
 	a.step(in.Locale, 1, 4, "reading the document", "belge okunuyor")
-	doc, err := a.openDocument(in.Locale, in.Inputs[0].Ref, in.Inputs[0].Name)
+	doc, err := a.openDocument(in.Inputs[0].Ref)
 	if err != nil {
 		return failText(a.intakeWords(err, in.Inputs[0].Name))
 	}
 	flds, err := parseFields(in.Params["fields"], fontkit.DefaultID, l)
 	if err != nil {
 		return failPlain(err.Error())
-	}
-	if doc.Converted() {
-		// Nobody could place a box on a document that was not a PDF yet.
-		flds = []envelope.Field{defaultBox(doc.Info)}
 	}
 	who := actorPerson(&in.Actor)
 	values := parseFill(in.Params["values"])
@@ -865,12 +762,8 @@ func (a *App) actionSign(in *wire.ActionRunInput) (*wire.ActionRunOutput, error)
 		return failf("The document could not be sealed: %v", "Belge mühürlenemedi: %v", err)
 	}
 	a.step(in.Locale, 3, 4, "writing the signed copy", "imzalı kopya yazılıyor")
-	ref, outName, err := a.writeSigned(in, doc, out, seal.Out)
+	ref, outName, err := a.writeSigned(in, out, seal.Out)
 	if err != nil {
-		if err.Error() == "version-of-office" {
-			return failf("“%s” had to be converted to PDF, so the result cannot be a new version of it. Choose “a new file beside it”.",
-				"“%s” PDF'e çevrilmek zorundaydı, bu yüzden sonuç onun yeni sürümü olamaz. “Yanına yeni dosya” seçin.", in.Inputs[0].Name)
-		}
 		return nil, err
 	}
 	a.markSigned(in.Inputs[0].Ref, in.Actor.ID)
@@ -886,49 +779,6 @@ func (a *App) actionSign(in *wire.ActionRunInput) (*wire.ActionRunOutput, error)
 		return l.Sf("Signed as %s → %s · certificate %s · sealed by filex · SHA-256 %s",
 			"%s olarak imzalandı → %s · sertifika %s · filex tarafından mühürlendi · SHA-256 %s", who.CertName(), what, res.CertFP, seal.SHA256)
 	})}, nil
-}
-
-// actionConvert is the hidden action "Convert to PDF" queues. (A `sign`
-// job with op=convert, which a screen before 0.1.1 queued, still lands in
-// opConvert through actionSign.)
-func (a *App) actionConvert(in *wire.ActionRunInput) (*wire.ActionRunOutput, error) {
-	if len(in.Inputs) == 0 {
-		return fail("No document was given.", "Belge verilmedi.")
-	}
-	return a.opConvert(in)
-}
-
-// opConvert turns an office document into a PDF beside it and stops
-// there: with a PDF in the folder the boxes can be placed and the whole
-// request flow works.
-func (a *App) opConvert(in *wire.ActionRunInput) (*wire.ActionRunOutput, error) {
-	a.step(in.Locale, 1, 2, "converting", "dönüştürülüyor")
-	doc, err := a.openDocument(in.Locale, in.Inputs[0].Ref, in.Inputs[0].Name)
-	if err != nil {
-		return failText(a.intakeWords(err, in.Inputs[0].Name))
-	}
-	if !doc.Converted() {
-		return fail("This document already is a PDF.", "Bu belge zaten PDF.")
-	}
-	name := stem(in.Inputs[0].Name) + ".pdf"
-	ref, err := a.H.WriteOutput(name, doc.Bytes)
-	if err != nil {
-		return nil, err
-	}
-	a.step(in.Locale, 2, 2, "done", "bitti")
-	return &wire.ActionRunOutput{OK: true, Outputs: []wire.OutputRef{ref},
-		Message: views.Tf("%s is ready. Open it to place signature boxes and ask for signatures.",
-			"%s hazır. İmza kutularını yerleştirip imza istemek için onu açın.", name)}, nil
-}
-
-// defaultBox is where a signature goes on a document nobody could draw
-// boxes on: the bottom right of the last page.
-func defaultBox(info *pdfsig.Info) envelope.Field {
-	last := len(info.Pages)
-	if last < 1 {
-		last = 1
-	}
-	return envelope.Field{ID: "sig-1", Type: fields.TypeSignature, Page: last, X: 0.56, Y: 0.82, W: 0.36, H: 0.10}
 }
 
 // ── verify ─────────────────────────────────────────────────────────────

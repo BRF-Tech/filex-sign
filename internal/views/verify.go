@@ -107,14 +107,14 @@ func summaryNodes(rep *verify.Report, sent *SentHash) []wire.Node {
 		// certified document changed in a way it forbids, and neither may
 		// this line. The signatures themselves are intact — say that, and
 		// that what is wrong is the change, named above.
-		out = append(out, text(T("Every signature itself is intact and comes from an authority this filex trusts — what is wrong is the change made after them, above.",
-			"Her imzanın kendisi bozulmamış ve bu filex'in güvendiği bir makamdan geliyor — yanlış olan, yukarıda belirtilen, onlardan sonra yapılan değişiklik.")))
+		out = append(out, text(T("Every signature itself is intact and comes from an authority this filex trusts - what is wrong is the change made after them, above.",
+			"Her imzanın kendisi bozulmamış ve bu filex'in güvendiği bir makamdan geliyor - yanlış olan, yukarıda belirtilen, onlardan sonra yapılan değişiklik.")))
 	case valid:
 		out = append(out, text(T("Every signature is valid and comes from an authority this filex trusts.",
 			"Her imza geçerli ve bu filex'in güvendiği bir makamdan geliyor.")))
 	default:
-		out = append(out, danger(T("Not every signature checks out — see the signatures below.",
-			"Her imza doğrulanmıyor — aşağıdaki imzalara bakın.")))
+		out = append(out, danger(T("Not every signature checks out - see the signatures below.",
+			"Her imza doğrulanmıyor - aşağıdaki imzalara bakın.")))
 	}
 	for _, s := range rep.Signatures {
 		if s.Certification > 0 {
@@ -131,8 +131,8 @@ func summaryNodes(rep *verify.Report, sent *SentHash) []wire.Node {
 	}
 	if rep.Sealed {
 		seal := rep.Signatures[len(rep.Signatures)-1]
-		out = append(out, text(Tf("Sealed by filex (seal %s): the document is closed — any change after the seal is not permitted.",
-			"filex tarafından mühürlendi (mühür %s): belge kapatıldı — mühürden sonraki her değişiklik izin verilmeyen değişikliktir.", seal.Cert.FP)))
+		out = append(out, text(Tf("Sealed by filex (seal %s): the document is closed - any change after the seal is not permitted.",
+			"filex tarafından mühürlendi (mühür %s): belge kapatıldı - mühürden sonraki her değişiklik izin verilmeyen değişikliktir.", seal.Cert.FP)))
 	}
 	out = append(out, text(Tf("SHA-256 of this file: %s", "Bu dosyanın SHA-256 özeti: %s", rep.SHA256)))
 	switch {
@@ -201,8 +201,8 @@ func violationWords(s verify.Signature, v verify.Violation) wire.Text {
 // repeats, word for word, because a wrong expectation is worse than no
 // signature at all.
 func Expectation(l Lang) wire.Text {
-	return T("A signature made here comes from this installation's own signing authority — the one filex generated, or the organisation's own certificate authority if the administrator imported one. A reader who imports that authority's certificate once sees these signatures as valid; a reader who has not says the validity is unknown, which is not the same as invalid. Where the law asks for a qualified electronic signature, use e-imza or m-imza instead.",
-		"Buradaki imza, bu kurulumun kendi imza makamından gelir — filex'in ürettiği makam ya da yönetici içe aktardıysa kurumun kendi sertifika makamı. O makamın sertifikasını bir kez içe aktaran okuyucu bu imzaları geçerli görür; aktarmayan “geçerlilik bilinmiyor” der, ki bu “geçersiz” demek değildir. Kanunun nitelikli elektronik imza istediği işlerde e-imza ya da m-imza kullanın.")
+	return T("A signature made here comes from this installation's own signing authority - the one filex generated, or the organisation's own certificate authority if the administrator imported one. A reader who imports that authority's certificate once sees these signatures as valid; a reader who has not says the validity is unknown, which is not the same as invalid. Where the law asks for a qualified electronic signature, use e-imza or m-imza instead.",
+		"Buradaki imza, bu kurulumun kendi imza makamından gelir - filex'in ürettiği makam ya da yönetici içe aktardıysa kurumun kendi sertifika makamı. O makamın sertifikasını bir kez içe aktaran okuyucu bu imzaları geçerli görür; aktarmayan “geçerlilik bilinmiyor” der, ki bu “geçersiz” demek değildir. Kanunun nitelikli elektronik imza istediği işlerde e-imza ya da m-imza kullanın.")
 }
 
 // authorityNodes names the signing authorities this instance trusts,
@@ -214,7 +214,7 @@ func authorityNodes(l Lang, rep *verify.Report) []wire.Node {
 	}
 	var rows []row
 	for i, ca := range rep.Authorities {
-		state := T("retired — signatures it made stay checkable", "emekli — verdiği imzalar denetlenebilir kalır")
+		state := T("retired - signatures it made stay checkable", "emekli - verdiği imzalar denetlenebilir kalır")
 		if i == 0 {
 			state = T("in use", "kullanımda")
 		}
@@ -240,7 +240,7 @@ func signatureCard(l Lang, sig verify.Signature, stamps bool) []wire.Node {
 	// trusts": Turkish sentence, English verdict, in the one place a reader
 	// is looking for a straight answer.
 	head := Each(func(l Lang) string {
-		return l.Sf("Signature %d — %s", "%d. imza — %s", sig.Index, verdict(l, sig))
+		return l.Sf("Signature %d - %s", "%d. imza - %s", sig.Index, verdict(l, sig))
 	})
 	rows := []row{
 		{ID: "who", Cells: map[string]wire.Text{"k": T("Identity", "Kimlik"), "v": Plain(identityOf(l, sig))}},
@@ -250,8 +250,8 @@ func signatureCard(l Lang, sig verify.Signature, stamps bool) []wire.Node {
 	}
 	if sig.NameConflict {
 		add("claim", T("Typed into the signature", "İmzaya yazılan ad"),
-			Tf("%s — the certificate says otherwise, and the certificate is what an authority put its name behind.",
-				"%s — sertifika başka söylüyor; makamın adını arkasına koyduğu şey sertifikadır.", sig.DeclaredName))
+			Tf("%s - the certificate says otherwise, and the certificate is what an authority put its name behind.",
+				"%s - sertifika başka söylüyor; makamın adını arkasına koyduğu şey sertifikadır.", sig.DeclaredName))
 	}
 	if sig.Reason != "" {
 		add("reason", T("Reason", "Gerekçe"), Plain(sig.Reason))
@@ -285,7 +285,7 @@ func signatureCard(l Lang, sig verify.Signature, stamps bool) []wire.Node {
 			SpanText(sig.Issuer.NotBefore, sig.Issuer.NotAfter))
 	} else {
 		add("ca", T("Signing authority", "İmza makamı"),
-			T("not stated — the document carries no issuer certificate", "belirtilmemiş — belgede makamın sertifikası yok"))
+			T("not stated - the document carries no issuer certificate", "belirtilmemiş - belgede makamın sertifikası yok"))
 	}
 	add("root", T("Chain ends at", "Zincirin ucu"), rootWords(l, sig))
 
@@ -362,15 +362,15 @@ func warningWords(w string) (wire.Text, bool) {
 func signatureKindWords(sig verify.Signature) wire.Text {
 	switch {
 	case sig.Seal:
-		return T("filex's seal — it closed the document (locked: no change permitted after it)",
-			"filex'in mührü — belgeyi kapattı (kilitli: sonrasında hiçbir değişikliğe izin yok)")
+		return T("filex's seal - it closed the document (locked: no change permitted after it)",
+			"filex'in mührü - belgeyi kapattı (kilitli: sonrasında hiçbir değişikliğe izin yok)")
 	case sig.Certification > 0:
 		return Each(func(l Lang) string {
-			return l.Sf("certification — after it, %s", "onay imzası — sonrasında %s", permissionWords(l, sig.Certification))
+			return l.Sf("certification - after it, %s", "onay imzası - sonrasında %s", permissionWords(l, sig.Certification))
 		})
 	case sig.Lock > 0:
 		return Each(func(l Lang) string {
-			return l.Sf("signature that locks the document — after it, %s", "belgeyi kilitleyen imza — sonrasında %s", permissionWords(l, sig.Lock))
+			return l.Sf("signature that locks the document - after it, %s", "belgeyi kilitleyen imza - sonrasında %s", permissionWords(l, sig.Lock))
 		})
 	}
 	return T("signature", "imza")
@@ -400,7 +400,7 @@ func verdict(l Lang, sig verify.Signature) string {
 	case sig.Trusted:
 		return l.S("valid, from an authority this filex trusts", "geçerli, bu filex'in güvendiği bir makamdan")
 	}
-	return l.S("intact — the authority behind it is not one this filex knows", "bozulmamış — arkasındaki makamı bu filex tanımıyor")
+	return l.S("intact - the authority behind it is not one this filex knows", "bozulmamış - arkasındaki makamı bu filex tanımıyor")
 }
 
 func whenWords(l Lang, sig verify.Signature, stamps bool) wire.Text {
@@ -409,28 +409,28 @@ func whenWords(l Lang, sig verify.Signature, stamps bool) wire.Text {
 		return T("not stated", "belirtilmemiş")
 	}
 	if sig.TimeProven {
-		return Tf("%s UTC — proven by a time-stamping authority", "%s UTC — bir zaman damgası makamınca kanıtlanmış", when)
+		return Tf("%s UTC - proven by a time-stamping authority", "%s UTC - bir zaman damgası makamınca kanıtlanmış", when)
 	}
 	if !stamps {
-		return Tf("%s UTC — declared by the signer's own clock, not proven. This installation does not add time stamps; an administrator can switch them on.",
-			"%s UTC — imzacının kendi saatinin beyanı, kanıtlanmış değil. Bu kurulum zaman damgası eklemiyor; yönetici açabilir.", when)
+		return Tf("%s UTC - declared by the signer's own clock, not proven. This installation does not add time stamps; an administrator can switch them on.",
+			"%s UTC - imzacının kendi saatinin beyanı, kanıtlanmış değil. Bu kurulum zaman damgası eklemiyor; yönetici açabilir.", when)
 	}
-	return Tf("%s UTC — declared by the signer's own clock, not proven",
-		"%s UTC — imzacının kendi saatinin beyanı, kanıtlanmış değil", when)
+	return Tf("%s UTC - declared by the signer's own clock, not proven",
+		"%s UTC - imzacının kendi saatinin beyanı, kanıtlanmış değil", when)
 }
 
 func coverWords(l Lang, sig verify.Signature) wire.Text {
 	if sig.CoversWholeFile {
 		return T("the whole file", "dosyanın tamamı")
 	}
-	return Tf("the first %d of %d bytes — the rest was appended afterwards",
-		"%[2]d baytın ilk %[1]d baytı — geri kalanı sonradan eklendi", sig.SignedBytes, sig.FileBytes)
+	return Tf("the first %d of %d bytes - the rest was appended afterwards",
+		"%[2]d baytın ilk %[1]d baytı - geri kalanı sonradan eklendi", sig.SignedBytes, sig.FileBytes)
 }
 
 func changeWords(l Lang, sig verify.Signature) wire.Text {
 	switch sig.LaterChanges {
 	case verify.ChangedNothing:
-		return T("none — nothing was added after it", "yok — sonrasına hiçbir şey eklenmedi")
+		return T("none - nothing was added after it", "yok - sonrasına hiçbir şey eklenmedi")
 	case verify.ChangedFields:
 		return T("form fields were filled in and signatures added; no page draws anything different",
 			"form alanları dolduruldu ve imza eklendi; hiçbir sayfa başka bir şey çizmiyor")
@@ -448,8 +448,8 @@ func cryptoWords(l Lang, sig verify.Signature) wire.Text {
 		return T("valid, and the chain reaches an authority this filex trusts",
 			"geçerli ve zincir bu filex'in güvendiği bir makama çıkıyor")
 	}
-	return T("valid — but the chain does not reach an authority this filex trusts",
-		"geçerli — ama zincir bu filex'in güvendiği bir makama çıkmıyor")
+	return T("valid - but the chain does not reach an authority this filex trusts",
+		"geçerli - ama zincir bu filex'in güvendiği bir makama çıkmıyor")
 }
 
 func certValidWords(l Lang, sig verify.Signature) wire.Text {
@@ -461,9 +461,9 @@ func certValidWords(l Lang, sig verify.Signature) wire.Text {
 		return SpanText(window.From, window.To)
 	}
 	if sig.WithinValidity {
-		return Tf("%s — the signing moment falls inside it", "%s — imza anı bu aralığın içinde", window)
+		return Tf("%s - the signing moment falls inside it", "%s - imza anı bu aralığın içinde", window)
 	}
-	return Tf("%s — the signing moment falls OUTSIDE it", "%s — imza anı bu aralığın DIŞINDA", window)
+	return Tf("%s - the signing moment falls OUTSIDE it", "%s - imza anı bu aralığın DIŞINDA", window)
 }
 
 // usageWords names what the certificate says it may be used for. verify
@@ -522,9 +522,9 @@ func rootWords(l Lang, sig verify.Signature) wire.Text {
 		return T("not stated", "belirtilmemiş")
 	}
 	if sig.RootTrusted {
-		return Tf("%s — one of this filex's own signing authorities", "%s — bu filex'in kendi imza makamlarından biri", sig.ChainRoot)
+		return Tf("%s - one of this filex's own signing authorities", "%s - bu filex'in kendi imza makamlarından biri", sig.ChainRoot)
 	}
-	return Tf("%s — not one of this filex's signing authorities", "%s — bu filex'in imza makamlarından biri değil", sig.ChainRoot)
+	return Tf("%s - not one of this filex's signing authorities", "%s - bu filex'in imza makamlarından biri değil", sig.ChainRoot)
 }
 
 func orUnstated(l Lang, s string) wire.Text {

@@ -177,8 +177,8 @@ func sealedBlock(l views.Lang, env *envelope.Envelope) string {
 	b.WriteString(l.S("How to check:\n", "Nasıl doğrularsınız:\n"))
 	b.WriteString(l.S("• In filex, open the file and choose “Verify”: it shows the signatures, the seal, and whether the file's hash is the one in this e-mail.\n",
 		"• filex'te dosyayı açın ve “Doğrula”yı seçin: imzaları, mührü ve özetin bu e-postadakiyle aynı olduğunu gösterir.\n"))
-	b.WriteString(l.Sf("• Or compute the hash yourself — Linux/macOS: sha256sum \"%s\" · Windows PowerShell: Get-FileHash \"%s\" -Algorithm SHA256 — and compare it with the one above. If a single character differs, the file was changed.\n",
-		"• Ya da özeti kendiniz hesaplayın — Linux/macOS: sha256sum \"%s\" · Windows PowerShell: Get-FileHash \"%s\" -Algorithm SHA256 — ve yukarıdakiyle karşılaştırın. Tek bir karakteri bile farklıysa dosya değiştirilmiştir.\n", name, name))
+	b.WriteString(l.Sf("• Or compute the hash yourself - Linux/macOS: sha256sum \"%s\" · Windows PowerShell: Get-FileHash \"%s\" -Algorithm SHA256 - and compare it with the one above. If a single character differs, the file was changed.\n",
+		"• Ya da özeti kendiniz hesaplayın - Linux/macOS: sha256sum \"%s\" · Windows PowerShell: Get-FileHash \"%s\" -Algorithm SHA256 - ve yukarıdakiyle karşılaştırın. Tek bir karakteri bile farklıysa dosya değiştirilmiştir.\n", name, name))
 	if env.Sealed.LockedForGood {
 		b.WriteString(l.S("\nThe signed file is also locked for good in filex.\n", "\nİmzalı dosya ayrıca filex'te kalıcı olarak kilitlendi.\n"))
 	}
@@ -322,8 +322,8 @@ func receiptNotice(env *envelope.Envelope, sg *envelope.Signer, res *signResult,
 		}
 		b.WriteString(l.S("\nThis is an identity receipt, not a signing capability: the private key that made your signature was destroyed the moment the signature was written.",
 			"\nBu bir kimlik makbuzudur, imza yeteneği değildir: imzanızı üreten özel anahtar imza yazılır yazılmaz yok edildi."))
-		b.WriteString(l.S("\nOpen the document and choose “Verify” to see the report — the fingerprints there should match these.",
-			"\nRaporu görmek için belgeyi açıp “Doğrula” deyin — oradaki parmak izleri bunlarla aynı olmalı."))
+		b.WriteString(l.S("\nOpen the document and choose “Verify” to see the report - the fingerprints there should match these.",
+			"\nRaporu görmek için belgeyi açıp “Doğrula” deyin - oradaki parmak izleri bunlarla aynı olmalı."))
 		return b.String()
 	})
 }
@@ -354,8 +354,8 @@ func requesterNotice(env *envelope.Envelope, pins map[string]string) wire.Text {
 		}
 		if env.Sequential() {
 			if next := env.Next(); next != nil {
-				b.WriteString(l.Sf("\nSigned one at a time — %s is first; the others hear from us in turn.",
-					"\nBirer birer imzalanacak — ilk sıra %s; diğerlerine sırası gelince haber verilecek.", next.Person.Identity()))
+				b.WriteString(l.Sf("\nSigned one at a time - %s is first; the others hear from us in turn.",
+					"\nBirer birer imzalanacak - ilk sıra %s; diğerlerine sırası gelince haber verilecek.", next.Person.Identity()))
 			}
 		}
 		if env.Locked {
@@ -365,8 +365,8 @@ func requesterNotice(env *envelope.Envelope, pins map[string]string) wire.Text {
 		for i := range env.Signers {
 			sg := &env.Signers[i]
 			if sg.HandOver() && sg.PageURL != "" {
-				b.WriteString(l.Sf("\n%s has no address — give them this link yourself: %s",
-					"\n%s için adres yok — bu bağlantıyı siz iletin: %s", sg.Person.Identity(), sg.PageURL))
+				b.WriteString(l.Sf("\n%s has no address - give them this link yourself: %s",
+					"\n%s için adres yok - bu bağlantıyı siz iletin: %s", sg.Person.Identity(), sg.PageURL))
 			}
 			if pin := pins[sg.ID]; pin != "" {
 				b.WriteString(l.Sf("\nPIN for %s: %s", "\n%s için PIN: %s", sg.Person.Identity(), pin))
@@ -375,12 +375,12 @@ func requesterNotice(env *envelope.Envelope, pins map[string]string) wire.Text {
 				continue
 			}
 			if sg.Internal() {
-				b.WriteString(l.Sf("\n%s could not be notified (%s) — ask them to open the file and use “Sign / Fill”.",
-					"\n%s kişisine haber verilemedi (%s) — dosyayı açıp “İmzala / Doldur” demesini isteyin.", sg.Person.Identity(), views.ErrWords(sg.MailError)))
+				b.WriteString(l.Sf("\n%s could not be notified (%s) - ask them to open the file and use “Sign / Fill”.",
+					"\n%s kişisine haber verilemedi (%s) - dosyayı açıp “İmzala / Doldur” demesini isteyin.", sg.Person.Identity(), views.ErrWords(sg.MailError)))
 				continue
 			}
-			b.WriteString(l.Sf("\nMail to %s could not be sent (%s) — pass the link on yourself: %s",
-				"\n%s adresine e-posta gönderilemedi (%s) — bağlantıyı kendiniz iletin: %s", sg.Person.Identity(), views.ErrWords(sg.MailError), sg.PageURL))
+			b.WriteString(l.Sf("\nMail to %s could not be sent (%s) - pass the link on yourself: %s",
+				"\n%s adresine e-posta gönderilemedi (%s) - bağlantıyı kendiniz iletin: %s", sg.Person.Identity(), views.ErrWords(sg.MailError), sg.PageURL))
 		}
 		return b.String()
 	})
@@ -440,7 +440,7 @@ func noticeFor(kind string, env *envelope.Envelope, sg *envelope.Signer) (title,
 	case "declined":
 		reason := ""
 		if sg != nil && sg.DeclineReason != "" {
-			reason = " — " + sg.DeclineReason
+			reason = " - " + sg.DeclineReason
 		}
 		return views.Tf("%s refused to sign", "%s imzalamayı reddetti", who),
 			views.Tf("“%s”: %s will not sign%s. The request is closed and the other links no longer work.",

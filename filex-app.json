@@ -1,7 +1,7 @@
 {
   "manifest_version": 1,
   "name": "sign",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "label": {
     "en": "e-Signature",
     "tr": "e-İmza",
@@ -10,10 +10,10 @@
     "fr": "Signature électronique"
   },
   "description": {
-    "en": "Sign documents yourself or ask others to sign, inside filex: named boxes placed on the page, a step-by-step screen for both sides, a receipt for every signer, and a Verify report on any PDF. Spanish, German and French are AI-translated, awaiting review by a native speaker — corrections welcome.",
-    "tr": "Belgeleri kendiniz imzalayın ya da başkalarını imzaya çağırın; hepsi filex içinde: sayfaya yerleştirilen adlandırılmış kutular, iki taraf için de adım adım ekran, her imzacıya makbuz ve her PDF için Doğrula raporu. İspanyolca, Almanca ve Fransızca yapay zekâ çevirisidir; ana dili bu diller olan birinin gözden geçirmesini bekliyor — düzeltmeler memnuniyetle karşılanır.",
+    "en": "Sign documents yourself or ask others to sign, inside filex: named boxes placed on the page, a step-by-step screen for both sides, a receipt for every signer, and a Verify report on any PDF. Spanish, German and French are AI-translated, awaiting review by a native speaker - corrections welcome.",
+    "tr": "Belgeleri kendiniz imzalayın ya da başkalarını imzaya çağırın; hepsi filex içinde: sayfaya yerleştirilen adlandırılmış kutular, iki taraf için de adım adım ekran, her imzacıya makbuz ve her PDF için Doğrula raporu. İspanyolca, Almanca ve Fransızca yapay zekâ çevirisidir; ana dili bu diller olan birinin gözden geçirmesini bekliyor - düzeltmeler memnuniyetle karşılanır.",
     "es": "Firme documentos usted mismo o pida a otras personas que los firmen, dentro de filex: recuadros con nombre colocados en la página, una pantalla paso a paso para ambas partes, un recibo para cada firmante y un informe Verificar para cualquier PDF. El español, el alemán y el francés están traducidos con IA y esperan la revisión de un hablante nativo; se agradecen las correcciones.",
-    "de": "Unterschreiben Sie Dokumente selbst oder bitten Sie andere darum, direkt in filex: benannte Felder auf der Seite, ein Schritt-für-Schritt-Bildschirm für beide Seiten, ein Beleg für jeden Unterzeichner und ein Prüfbericht für jedes PDF. Spanisch, Deutsch und Französisch wurden von einer KI übersetzt und warten auf die Prüfung durch Muttersprachler — Korrekturen sind willkommen.",
+    "de": "Unterschreiben Sie Dokumente selbst oder bitten Sie andere darum, direkt in filex: benannte Felder auf der Seite, ein Schritt-für-Schritt-Bildschirm für beide Seiten, ein Beleg für jeden Unterzeichner und ein Prüfbericht für jedes PDF. Spanisch, Deutsch und Französisch wurden von einer KI übersetzt und warten auf die Prüfung durch Muttersprachler - Korrekturen sind willkommen.",
     "fr": "Signez des documents vous-même ou demandez à d’autres de les signer, dans filex : des zones nommées placées sur la page, un écran pas à pas pour les deux parties, un reçu pour chaque signataire et un rapport Vérifier pour tout PDF. L’espagnol, l’allemand et le français sont traduits par IA et attendent la relecture d’un locuteur natif ; les corrections sont les bienvenues."
   },
   "icon": "sign",
@@ -37,7 +37,6 @@
     "mail:send",
     "notify:send",
     "users:lookup",
-    "engines:libreoffice",
     "http:freetsa.org",
     "http:fonts.gstatic.com",
     "schedule"
@@ -58,11 +57,11 @@
       "fr": "Pour écrire le document signé, le journal d’audit quand vous le demandez, et le reçu de chaque signataire."
     },
     "files:lock": {
-      "en": "To freeze the document read-only for everyone while its signatures are collected, and to keep the signed file locked for good once every signature is in — each only when you switch it on.",
+      "en": "To freeze the document read-only for everyone while its signatures are collected, and to keep the signed file locked for good once every signature is in - each only when you switch it on.",
       "tr": "Açtığınızda: imzaları toplanırken belgeyi herkes için salt-okunur dondurmak ve her imza gelince imzalı dosyayı kalıcı olarak kilitli tutmak için.",
       "es": "Para congelar el documento en solo lectura para todos mientras se recogen sus firmas, y para mantener el archivo firmado bloqueado de forma permanente cuando estén todas las firmas; cada cosa solo cuando usted la activa.",
-      "de": "Um das Dokument für alle schreibgeschützt einzufrieren, während Unterschriften gesammelt werden, und die unterschriebene Datei dauerhaft gesperrt zu halten, sobald alle Unterschriften vorliegen – beides nur, wenn Sie es einschalten.",
-      "fr": "Pour geler le document en lecture seule pour tous pendant la collecte des signatures, et garder le fichier signé verrouillé définitivement une fois toutes les signatures recueillies — chacun seulement si vous l’activez."
+      "de": "Um das Dokument für alle schreibgeschützt einzufrieren, während Unterschriften gesammelt werden, und die unterschriebene Datei dauerhaft gesperrt zu halten, sobald alle Unterschriften vorliegen - beides nur, wenn Sie es einschalten.",
+      "fr": "Pour geler le document en lecture seule pour tous pendant la collecte des signatures, et garder le fichier signé verrouillé définitivement une fois toutes les signatures recueillies - chacun seulement si vous l’activez."
     },
     "sign": {
       "en": "To have this installation's signing authority issue a certificate per signer and sign the document digest, and to seal a finished document with this installation's own seal. The private keys never leave filex; each signer's is destroyed the moment the signature is written.",
@@ -72,11 +71,11 @@
       "fr": "Pour que l’autorité de certification de cette installation émette un certificat par signataire et signe l’empreinte du document, et pour sceller un document terminé avec le sceau propre à cette installation. Les clés privées ne quittent jamais filex ; celle de chaque signataire est détruite dès que la signature est écrite."
     },
     "state": {
-      "en": "To keep the signature request (signers, boxes, progress) with the document, to keep each signer's certificate so their receipt can be given again, to mark the documents that are waiting for a signature, and to list those marks on the Signatures screen — which only ever shows files you may already see.",
-      "tr": "İmza isteğini (imzacılar, kutular, ilerleme) belgeyle birlikte tutmak, makbuzu yeniden verilebilsin diye her imzacının sertifikasını saklamak, imza bekleyen belgeleri işaretlemek ve bu işaretleri İmzalar ekranında listelemek için — o ekran yalnızca zaten görebildiğiniz dosyaları gösterir.",
+      "en": "To keep the signature request (signers, boxes, progress) with the document, to keep each signer's certificate so their receipt can be given again, to mark the documents that are waiting for a signature, and to list those marks on the Signatures screen - which only ever shows files you may already see.",
+      "tr": "İmza isteğini (imzacılar, kutular, ilerleme) belgeyle birlikte tutmak, makbuzu yeniden verilebilsin diye her imzacının sertifikasını saklamak, imza bekleyen belgeleri işaretlemek ve bu işaretleri İmzalar ekranında listelemek için - o ekran yalnızca zaten görebildiğiniz dosyaları gösterir.",
       "es": "Para guardar la solicitud de firma (firmantes, recuadros, avance) con el documento, conservar el certificado de cada firmante para poder volver a entregar su recibo, marcar los documentos que esperan una firma y listar esas marcas en la pantalla Firmas, que solo muestra archivos que usted ya puede ver.",
-      "de": "Um die Unterschriftsanfrage (Unterzeichner, Felder, Fortschritt) beim Dokument zu speichern, das Zertifikat jedes Unterzeichners aufzubewahren, damit sein Beleg erneut ausgegeben werden kann, Dokumente zu markieren, die auf eine Unterschrift warten, und diese Markierungen im Bildschirm „Unterschriften“ aufzulisten – der nur Dateien zeigt, die Sie ohnehin sehen dürfen.",
-      "fr": "Pour conserver la demande de signature (signataires, zones, avancement) avec le document, garder le certificat de chaque signataire afin que son reçu puisse être redonné, marquer les documents en attente de signature et lister ces marques dans l’écran « Signatures » — qui n’affiche que des fichiers que vous pouvez déjà voir."
+      "de": "Um die Unterschriftsanfrage (Unterzeichner, Felder, Fortschritt) beim Dokument zu speichern, das Zertifikat jedes Unterzeichners aufzubewahren, damit sein Beleg erneut ausgegeben werden kann, Dokumente zu markieren, die auf eine Unterschrift warten, und diese Markierungen im Bildschirm „Unterschriften“ aufzulisten - der nur Dateien zeigt, die Sie ohnehin sehen dürfen.",
+      "fr": "Pour conserver la demande de signature (signataires, zones, avancement) avec le document, garder le certificat de chaque signataire afin que son reçu puisse être redonné, marquer les documents en attente de signature et lister ces marques dans l’écran « Signatures » - qui n’affiche que des fichiers que vous pouvez déjà voir."
     },
     "settings": {
       "en": "To read the two settings the administrator controls: whether signatures are time-stamped, and by which authority.",
@@ -86,11 +85,11 @@
       "fr": "Pour lire les deux paramètres que l’administrateur contrôle : si les signatures sont horodatées, et par quelle autorité."
     },
     "public_pages": {
-      "en": "To open a filex share for each outside signer (their signing link, then their receipt) and one for the finished document — and to notice when somebody revokes or deletes one of those signing links on the Shares screen.",
+      "en": "To open a filex share for each outside signer (their signing link, then their receipt) and one for the finished document - and to notice when somebody revokes or deletes one of those signing links on the Shares screen.",
       "tr": "Dışarıdan her imzacı için birer filex paylaşımı (önce imza bağlantısı, sonra makbuz) ve tamamlanan belge için bir paylaşım açmak ve bu imza bağlantılarından biri Paylaşımlar ekranında iptal edildiğinde ya da silindiğinde bunu fark etmek için.",
       "es": "Para abrir un enlace compartido de filex para cada firmante externo (primero su enlace de firma, luego su recibo) y otro para el documento terminado, y para detectar cuando alguien revoca o elimina uno de esos enlaces de firma en la pantalla Enlaces compartidos.",
-      "de": "Um für jeden externen Unterzeichner eine filex-Freigabe zu öffnen (zuerst seinen Unterschriftslink, dann seinen Beleg) und eine für das fertige Dokument – und um zu bemerken, wenn jemand einen dieser Unterschriftslinks im Bildschirm „Freigaben“ widerruft oder löscht.",
-      "fr": "Pour ouvrir un partage filex pour chaque signataire externe (d’abord son lien de signature, puis son reçu) et un pour le document terminé — et pour remarquer quand quelqu’un révoque ou supprime l’un de ces liens de signature dans l’écran « Partages »."
+      "de": "Um für jeden externen Unterzeichner eine filex-Freigabe zu öffnen (zuerst seinen Unterschriftslink, dann seinen Beleg) und eine für das fertige Dokument - und um zu bemerken, wenn jemand einen dieser Unterschriftslinks im Bildschirm „Freigaben“ widerruft oder löscht.",
+      "fr": "Pour ouvrir un partage filex pour chaque signataire externe (d’abord son lien de signature, puis son reçu) et un pour le document terminé - et pour remarquer quand quelqu’un révoque ou supprime l’un de ces liens de signature dans l’écran « Partages »."
     },
     "mail:send": {
       "en": "To e-mail a signer their link, their receipt and the finished document (a PIN is never in a mail).",
@@ -113,19 +112,12 @@
       "de": "Um Unterzeichner aus den Benutzern dieser Installation auszuwählen.",
       "fr": "Pour choisir des signataires parmi les utilisateurs de cette installation."
     },
-    "engines:libreoffice": {
-      "en": "To turn an office document (ODT, DOCX, XLSX, PPTX…) into the PDF a signature can live in.",
-      "tr": "Bir ofis belgesini (ODT, DOCX, XLSX, PPTX…) imzanın yaşayabileceği PDF'e çevirmek için.",
-      "es": "Para convertir un documento de oficina (ODT, DOCX, XLSX, PPTX…) en el PDF que puede contener una firma.",
-      "de": "Um ein Office-Dokument (ODT, DOCX, XLSX, PPTX…) in das PDF umzuwandeln, in dem eine Unterschrift stehen kann.",
-      "fr": "Pour transformer un document bureautique (ODT, DOCX, XLSX, PPTX…) en PDF, qui peut porter une signature."
-    },
     "http:freetsa.org": {
-      "en": "Only when the administrator switches time stamping on: to ask a time-stamping authority to date a signature. The request carries the signature's digest and a nonce — never the document.",
-      "tr": "Yalnız yönetici zaman damgasını açtığında: bir zaman damgası makamından imzaya tarih atmasını istemek için. İstek imzanın özetini ve rastgele bir sayı taşır — belgeyi asla.",
+      "en": "Only when the administrator switches time stamping on: to ask a time-stamping authority to date a signature. The request carries the signature's digest and a nonce - never the document.",
+      "tr": "Yalnız yönetici zaman damgasını açtığında: bir zaman damgası makamından imzaya tarih atmasını istemek için. İstek imzanın özetini ve rastgele bir sayı taşır - belgeyi asla.",
       "es": "Solo cuando el administrador activa el sellado de tiempo: para pedir a una autoridad de sellado de tiempo que feche una firma. La solicitud lleva el resumen de la firma y un nonce, nunca el documento.",
-      "de": "Nur wenn der Administrator Zeitstempel einschaltet: um einen Zeitstempeldienst zu bitten, eine Unterschrift zu datieren. Die Anfrage enthält den Hashwert der Unterschrift und eine Nonce – nie das Dokument.",
-      "fr": "Uniquement si l’administrateur active l’horodatage : pour demander à une autorité d’horodatage de dater une signature. La requête contient l’empreinte de la signature et un nonce — jamais le document."
+      "de": "Nur wenn der Administrator Zeitstempel einschaltet: um einen Zeitstempeldienst zu bitten, eine Unterschrift zu datieren. Die Anfrage enthält den Hashwert der Unterschrift und eine Nonce - nie das Dokument.",
+      "fr": "Uniquement si l’administrateur active l’horodatage : pour demander à une autorité d’horodatage de dater une signature. La requête contient l’empreinte de la signature et un nonce - jamais le document."
     },
     "http:fonts.gstatic.com": {
       "en": "Only when a document carries text in a script this app's own fonts do not draw (Arabic, Hebrew, Devanagari, Thai, Chinese, Japanese, Korean…): to download the one Noto font that script needs, once, from Google Fonts, and keep it. Every file is pinned by its SHA-256 and filex refuses any other bytes; nothing is sent but the file's address. Without this, such text is not printed and the screens say so before anybody signs.",
@@ -135,11 +127,11 @@
       "fr": "Uniquement quand un document contient du texte dans une écriture que les polices propres à cette application ne dessinent pas (arabe, hébreu, devanagari, thaï, chinois, japonais, coréen…) : pour télécharger une fois depuis Google Fonts la seule police Noto dont cette écriture a besoin, et la conserver. Chaque fichier est épinglé par son empreinte SHA-256 et filex refuse tout autre contenu ; rien n’est envoyé hormis l’adresse du fichier. Sans cela, ce texte n’est pas imprimé, et les écrans le signalent avant que quiconque signe."
     },
     "schedule": {
-      "en": "To close a request the moment its deadline passes, or its signing link is ended on the Shares screen, and to send the reminders you asked for — without waiting for somebody to open the document: filex wakes this app once an hour (and at once when one of its links is ended) and runs that work at the minute it falls due.",
-      "tr": "Bir isteği süresi dolduğu anda ya da imza bağlantısı Paylaşımlar ekranında sonlandırıldığında kapatmak ve istediğiniz hatırlatmaları göndermek için — birinin belgeyi açmasını beklemeden: filex bu uygulamayı saatte bir (ve bağlantılarından biri sonlandırılınca hemen) uyandırır ve işi, zamanı geldiği dakikada çalıştırır.",
+      "en": "To close a request the moment its deadline passes, or its signing link is ended on the Shares screen, and to send the reminders you asked for - without waiting for somebody to open the document: filex wakes this app once an hour (and at once when one of its links is ended) and runs that work at the minute it falls due.",
+      "tr": "Bir isteği süresi dolduğu anda ya da imza bağlantısı Paylaşımlar ekranında sonlandırıldığında kapatmak ve istediğiniz hatırlatmaları göndermek için - birinin belgeyi açmasını beklemeden: filex bu uygulamayı saatte bir (ve bağlantılarından biri sonlandırılınca hemen) uyandırır ve işi, zamanı geldiği dakikada çalıştırır.",
       "es": "Para cerrar una solicitud en cuanto vence su fecha límite, o cuando su enlace de firma se finaliza en la pantalla Enlaces compartidos, y para enviar los recordatorios que pidió, sin esperar a que alguien abra el documento: filex despierta esta aplicación una vez por hora (y enseguida cuando se finaliza uno de sus enlaces) y hace ese trabajo en el minuto en que corresponde.",
-      "de": "Um eine Anfrage zu schließen, sobald ihre Frist abläuft oder ihr Unterschriftslink im Bildschirm „Freigaben“ beendet wird, und um die gewünschten Erinnerungen zu senden – ohne zu warten, bis jemand das Dokument öffnet: filex weckt diese App einmal pro Stunde (und sofort, wenn einer ihrer Links beendet wird) und erledigt diese Arbeit in der Minute, in der sie fällig ist.",
-      "fr": "Pour clore une demande dès que sa date limite est passée, ou que son lien de signature a pris fin dans l’écran « Partages », et pour envoyer les rappels demandés — sans attendre que quelqu’un ouvre le document : filex réveille cette application une fois par heure (et aussitôt quand l’un de ses liens prend fin) et exécute ce travail à la minute où il est dû."
+      "de": "Um eine Anfrage zu schließen, sobald ihre Frist abläuft oder ihr Unterschriftslink im Bildschirm „Freigaben“ beendet wird, und um die gewünschten Erinnerungen zu senden - ohne zu warten, bis jemand das Dokument öffnet: filex weckt diese App einmal pro Stunde (und sofort, wenn einer ihrer Links beendet wird) und erledigt diese Arbeit in der Minute, in der sie fällig ist.",
+      "fr": "Pour clore une demande dès que sa date limite est passée, ou que son lien de signature a pris fin dans l’écran « Partages », et pour envoyer les rappels demandés - sans attendre que quelqu’un ouvre le document : filex réveille cette application une fois par heure (et aussitôt quand l’un de ses liens prend fin) et exécute ce travail à la minute où il est dû."
     }
   },
   "settings": [
@@ -176,8 +168,8 @@
         "en": "The RFC 3161 endpoint. Empty uses https://freetsa.org/tsr, which is the host this app asks permission for; another host needs its own http: grant.",
         "tr": "RFC 3161 adresi. Boş bırakılırsa bu uygulamanın izin istediği https://freetsa.org/tsr kullanılır; başka bir adres kendi http: iznini ister.",
         "es": "El endpoint RFC 3161. Si se deja vacío, se usa https://freetsa.org/tsr, que es el host para el que esta aplicación pide permiso; otro host necesita su propio permiso http:.",
-        "de": "Der RFC-3161-Endpunkt. Leer bedeutet https://freetsa.org/tsr – der Host, für den diese App eine Berechtigung anfordert; ein anderer Host braucht seine eigene http:-Berechtigung.",
-        "fr": "L’endpoint RFC 3161. Vide, https://freetsa.org/tsr est utilisé — l’hôte pour lequel cette application demande l’autorisation ; un autre hôte nécessite sa propre autorisation http:."
+        "de": "Der RFC-3161-Endpunkt. Leer bedeutet https://freetsa.org/tsr - der Host, für den diese App eine Berechtigung anfordert; ein anderer Host braucht seine eigene http:-Berechtigung.",
+        "fr": "L’endpoint RFC 3161. Vide, https://freetsa.org/tsr est utilisé - l’hôte pour lequel cette application demande l’autorisation ; un autre hôte nécessite sa propre autorisation http:."
       },
       "placeholder": "https://freetsa.org/tsr",
       "show_when": {
@@ -224,26 +216,6 @@
         "ext": [
           "pdf"
         ],
-        "engine_ext": {
-          "libreoffice": [
-            "odt",
-            "ott",
-            "ods",
-            "odp",
-            "odg",
-            "fodt",
-            "rtf",
-            "doc",
-            "docx",
-            "dot",
-            "dotx",
-            "xls",
-            "xlsx",
-            "ppt",
-            "pptx",
-            "txt"
-          ]
-        },
         "no_state": [
           "pending"
         ]
@@ -273,26 +245,6 @@
         "ext": [
           "pdf"
         ],
-        "engine_ext": {
-          "libreoffice": [
-            "odt",
-            "ott",
-            "ods",
-            "odp",
-            "odg",
-            "fodt",
-            "rtf",
-            "doc",
-            "docx",
-            "dot",
-            "dotx",
-            "xls",
-            "xlsx",
-            "ppt",
-            "pptx",
-            "txt"
-          ]
-        },
         "no_state": [
           "pending"
         ],
@@ -384,50 +336,6 @@
       },
       "limits": {
         "timeout_s": 600
-      }
-    },
-    {
-      "id": "convert",
-      "label": {
-        "en": "Convert to PDF",
-        "tr": "PDF'e dönüştür",
-        "es": "Convertir a PDF",
-        "de": "In PDF umwandeln",
-        "fr": "Convertir en PDF"
-      },
-      "icon": "sign",
-      "applies": {
-        "kind": "file",
-        "ext": [
-          "odt",
-          "ott",
-          "ods",
-          "odp",
-          "odg",
-          "fodt",
-          "rtf",
-          "doc",
-          "docx",
-          "dot",
-          "dotx",
-          "xls",
-          "xlsx",
-          "ppt",
-          "pptx",
-          "txt"
-        ],
-        "no_state": [
-          "pending"
-        ]
-      },
-      "hidden": true,
-      "min_role": "editor",
-      "output": {
-        "mode": "sibling",
-        "name": "{stem}.pdf"
-      },
-      "limits": {
-        "timeout_s": 300
       }
     }
   ],
@@ -594,6 +502,6 @@
   },
   "wasm": {
     "url": "https://github.com/BRF-Tech/filex-sign/releases/download/{tag}/plugin.wasm",
-    "sha256": "fb2dbda1aa46a809fe307f86368f2f49dee8aabe7d7e2033845fc01a28671461"
+    "sha256": "6a3d2e59aaadb9c69bd219652d2078787e09520f9b7da223646e9dd131396ff3"
   }
 }

@@ -69,7 +69,7 @@ func SignSelf(l Lang, doc Doc, who envelope.Person, st SelfState, errs map[strin
 	me := []SignerLabel{{ID: "me", Label: who.Identity(), Color: palette[0], Name: who.CertName(), Email: who.Email,
 		Self: true, IP: st.IP}}
 	s := &wire.Surface{
-		Title: Tf("Sign %s", "%s — imzala", doc.Name),
+		Title: Tf("Sign %s", "%s - imzala", doc.Name),
 		Size:  "xl",
 		State: SelfStateOf(st),
 		Nodes: []wire.Node{steps(stepStates(st.Step,

@@ -67,11 +67,10 @@ type Host interface {
 	FileLockMessage(ref string, ttlDays int, key string, args map[string]string) (time.Time, error)
 	FileUnlock(ref string) error
 
-	// EngineAvailable / EngineRun reach the host's heavy binaries; the
-	// plugin only ever asks for LibreOffice, to turn an office document
-	// into the PDF a signature can live in.
-	EngineAvailable(name string) bool
-	EngineRun(req pluginkit.EngineRequest) (*pluginkit.EngineResult, error)
+	// ⚠ No engines: this app signs PDFs and converts nothing (2026-10-02,
+	// the owner). Turning an office document into a PDF is the Convert
+	// app's work, so the manifest asks for no `engines:` permission and
+	// this seam has no way to run one.
 
 	NotifySend(n pluginkit.Notice) (int64, error)
 	MailSend(to, subject, body string) error
@@ -168,11 +167,7 @@ func (Kit) FileLockMessage(ref string, ttlDays int, key string, args map[string]
 func (Kit) FileLock(ref string, ttlDays int, reason string) (time.Time, error) {
 	return pluginkit.FileLock(ref, ttlDays, reason)
 }
-func (Kit) FileUnlock(ref string) error      { return pluginkit.FileUnlock(ref) }
-func (Kit) EngineAvailable(name string) bool { return pluginkit.EngineAvailable(name) }
-func (Kit) EngineRun(req pluginkit.EngineRequest) (*pluginkit.EngineResult, error) {
-	return pluginkit.EngineRun(req)
-}
+func (Kit) FileUnlock(ref string) error                  { return pluginkit.FileUnlock(ref) }
 func (Kit) NotifySend(n pluginkit.Notice) (int64, error) { return pluginkit.NotifySend(n) }
 func (Kit) MailSend(to, subject, body string) error      { return pluginkit.MailSend(to, subject, body) }
 func (Kit) ShareCreate(req pluginkit.PageCreate) (*pluginkit.PageCreated, error) {

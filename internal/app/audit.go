@@ -97,7 +97,7 @@ func (a *App) auditLines(env *envelope.Envelope, l views.Lang) ([]pdfdoc.AuditLi
 				where = l.S("filled in inside filex", "filex içinde doldurdu")
 			}
 		}
-		lines = append(lines, line(fmt.Sprintf("%d. %s — %s (%s)", i+1, sg.Person.Identity(), read(views.ActWords(sg.Status, signs)), where)))
+		lines = append(lines, line(fmt.Sprintf("%d. %s - %s (%s)", i+1, sg.Person.Identity(), read(views.ActWords(sg.Status, signs)), where)))
 		var when []string
 		// ⚠ Both words stay WRITTEN HERE, each with a timestamp of its own,
 		// and only one of the two is ever set. internal/i18n refuses a text
@@ -155,7 +155,7 @@ func (a *App) auditLines(env *envelope.Envelope, l views.Lang) ([]pdfdoc.AuditLi
 		if sg := env.Signer(f.SignedBy); sg != nil {
 			by = sg.Person.Display()
 		}
-		filled = append(filled, line(l.Sf("%s (page %d): %s — %s", "%s (sayfa %d): %s — %s", name, f.Page, f.Value, orDash(by))))
+		filled = append(filled, line(l.Sf("%s (page %d): %s - %s", "%s (sayfa %d): %s - %s", name, f.Page, f.Value, orDash(by))))
 	}
 	if len(filled) > 0 {
 		lines = append(lines, head(l.S("Filled in", "Doldurulanlar")))
@@ -215,7 +215,7 @@ func (a *App) auditLines(env *envelope.Envelope, l views.Lang) ([]pdfdoc.AuditLi
 		muted(l.S("This trail was written by the filex e-Signature app when the request closed. It is a separate file: adding pages to the signed document would break the signatures.",
 			"Bu iz, istek kapandığında filex e-İmza uygulaması tarafından yazıldı. Ayrı bir dosyadır: imzalı belgeye sayfa eklemek imzaları bozardı.")),
 	)
-	return lines, l.S("Signature audit trail — ", "İmza denetim izi — ") + env.Document
+	return lines, l.S("Signature audit trail - ", "İmza denetim izi - ") + env.Document
 }
 
 // eventWord is an event type as the trail prints it.
@@ -264,7 +264,7 @@ func eventNote(l views.Lang, env *envelope.Envelope, e envelope.Event) string {
 
 func orDash(s string) string {
 	if strings.TrimSpace(s) == "" {
-		return "—"
+		return "-"
 	}
 	return s
 }

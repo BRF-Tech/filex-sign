@@ -177,7 +177,7 @@ func TestFill_ApproveStepShowsTheValueAsPrinted(t *testing.T) {
 		}
 	}
 	words := surfaceWords(scr)
-	for _, want := range []string{"山田 Taro — printed as “ Taro”", "山田 Taro — “ Taro” olarak basılacak"} {
+	for _, want := range []string{"山田 Taro - printed as “ Taro”", "山田 Taro - “ Taro” olarak basılacak"} {
 		if !strings.Contains(words, want) {
 			t.Errorf("the approve step does not say %q", want)
 		}

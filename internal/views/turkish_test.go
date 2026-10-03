@@ -47,7 +47,6 @@ func turkishScreens(t *testing.T, l Lang) map[string]*wire.Surface {
 	out["already-requested"] = AlreadyRequested(l, doc(), e)
 	out["read-only-sign"] = ReadOnlyDoc(l, doc(), false)
 	out["read-only-request"] = ReadOnlyDoc(l, doc(), true)
-	out["office-request-no-engine"] = RequestOffice(l, Doc{Name: "a.docx"}, false)
 	out["status-expired-link"] = Status(l, StatusInput{Doc: doc(), Env: e, SignaturesInFile: 1, Expired: true,
 		RemindDue: true, ShowLinkFor: "s2", CAName: "filex", CAFP: "AAAA"})
 	return out
@@ -70,7 +69,7 @@ func partReport() *verify.Report {
 // when it is NOT a translation that went missing.
 var allowedInTurkish = map[string]bool{
 	// Products, formats, standards, algorithms.
-	"filex": true, "libreoffice": true, "adobe": true, "acrobat": true, "reader": true, "foxit": true,
+	"filex": true, "adobe": true, "acrobat": true, "reader": true, "foxit": true,
 	"pades": true, "etsi": true, "cades": true, "detached": true, "ecdsa": true, "sha256": true,
 	"docmdp": true, "okular": true, "firefox": true, "noto": true, "google": true, "fonts": true,
 	"filex_secret_key": true,

@@ -85,21 +85,21 @@ func PrintNotes(id, label, value string, face *fontkit.Face, consequence wire.Te
 		case fontkit.NoFont:
 			script := strings.ReplaceAll(ms[0].Script, "_", " ")
 			msg = Each(func(l Lang) string {
-				return l.Sf("“%s”: %s cannot be printed — no font this app can use draws the %s script. %s",
-					"“%s”: %s basılamaz — bu uygulamanın kullanabildiği hiçbir yazı tipi %s yazısını çizmiyor. %s", label, chars, script, In(consequence, l))
+				return l.Sf("“%s”: %s cannot be printed - no font this app can use draws the %s script. %s",
+					"“%s”: %s basılamaz - bu uygulamanın kullanabildiği hiçbir yazı tipi %s yazısını çizmiyor. %s", label, chars, script, In(consequence, l))
 			})
 		case fontkit.Unavailable:
 			msg = Each(func(l Lang) string {
-				return l.Sf("“%s”: %s cannot be printed right now — the font for these characters could not be downloaded (this installation may have no internet access, or fonts.gstatic.com is not allowed for this app). %s",
-					"“%s”: %s şu anda basılamıyor — bu karakterlerin yazı tipi indirilemedi (bu kurulumun internet erişimi olmayabilir ya da bu uygulamaya fonts.gstatic.com izni verilmemiş olabilir). %s", label, chars, In(consequence, l))
+				return l.Sf("“%s”: %s cannot be printed right now - the font for these characters could not be downloaded (this installation may have no internet access, or fonts.gstatic.com is not allowed for this app). %s",
+					"“%s”: %s şu anda basılamıyor - bu karakterlerin yazı tipi indirilemedi (bu kurulumun internet erişimi olmayabilir ya da bu uygulamaya fonts.gstatic.com izni verilmemiş olabilir). %s", label, chars, In(consequence, l))
 			})
 		case fontkit.Downloading:
 			msg = Tf("“%s”: the font for %s is still being downloaded. If it has not arrived by the time this is printed, these characters will be left out.",
 				"“%s”: %s için yazı tipi hâlâ indiriliyor. Basılacağı ana kadar gelmezse bu karakterler dışarıda kalır.", label, chars)
 		default:
 			msg = Each(func(l Lang) string {
-				return l.Sf("“%s”: %s cannot be printed — no font this app can use has these characters. %s",
-					"“%s”: %s basılamaz — bu uygulamanın kullanabildiği hiçbir yazı tipinde bu karakterler yok. %s", label, chars, In(consequence, l))
+				return l.Sf("“%s”: %s cannot be printed - no font this app can use has these characters. %s",
+					"“%s”: %s basılamaz - bu uygulamanın kullanabildiği hiçbir yazı tipinde bu karakterler yok. %s", label, chars, In(consequence, l))
 			})
 		}
 		out = append(out, wire.Node{ID: "print-note:" + id + ":" + reason, Type: "text",

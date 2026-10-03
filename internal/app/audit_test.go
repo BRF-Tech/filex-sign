@@ -78,16 +78,16 @@ func TestAudit_TheTrailSpeaksTheRequestersLanguage(t *testing.T) {
 		// ⭐ The case that matters: a Turkish requester, and the trail written
 		// by the job of an outside signer whose screen was English.
 		{"tr", "en",
-			[]string{"İmza denetim izi — ", "Katılımcılar (kimlik:", "Olay günlüğü", "İmza makamı", "Nasıl doğrulanır",
+			[]string{"İmza denetim izi - ", "Katılımcılar (kimlik:", "Olay günlüğü", "İmza makamı", "Nasıl doğrulanır",
 				"dosya donduruldu: evet", "birer birer", "Paylaşımlar ekranında iptal edildi", "3 imzacı",
 				"Buradaki imza, bu kurulumun kendi imza makamından gelir", "İptal edildi", "Reddetti", "Görev unvanı (sayfa 1)"},
 			[]string{"Signature audit trail", "Event log", "How to verify", "3 signer(s)", "revoked", "outside signer"}},
 		{"en", "tr",
-			[]string{"Signature audit trail — ", "Participants (identity:", "Event log", "How to verify", "file frozen: yes",
+			[]string{"Signature audit trail - ", "Participants (identity:", "Event log", "How to verify", "file frozen: yes",
 				"revoked on the Shares screen", "3 signer(s)", "A signature made here comes from"},
 			[]string{"İmza denetim izi", "Olay günlüğü", "imzacı", "donduruldu"}},
 		// A request recorded before its locale was: the job's own language.
-		{"", "tr", []string{"İmza denetim izi — "}, []string{"Signature audit trail"}},
+		{"", "tr", []string{"İmza denetim izi - "}, []string{"Signature audit trail"}},
 	} {
 		env := turkishHeavy(tc.requester)
 		lines, title := a.auditLines(env, auditLang(env, tc.job))

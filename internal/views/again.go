@@ -42,7 +42,7 @@ func AlreadyRequested(l Lang, doc Doc, env *envelope.Envelope) *wire.Surface {
 	}
 	who := strings.Join(names, ", ")
 	s := &wire.Surface{
-		Title: Tf("Request signatures — %s", "İmza iste — %s", doc.Name),
+		Title: Tf("Request signatures - %s", "İmza iste - %s", doc.Name),
 		Size:  "lg",
 		State: map[string]any{"view": "request", "refused": "open_request"},
 		Nodes: []wire.Node{
@@ -53,7 +53,7 @@ func AlreadyRequested(l Lang, doc Doc, env *envelope.Envelope) *wire.Surface {
 			text(Tf("%[1]s asked %[2]s to sign it on %[3]s, and it is still open: %[4]d of %[5]d signed.",
 				"%[1]s, %[3]s tarihinde %[2]s kişisinden imza istedi ve istek hâlâ açık: %[4]d/%[5]d imzalandı.",
 				env.Requester.Identity(), who, Day(env.CreatedAt), signed, total)),
-			text(T("A document carries one signature request at a time, so a second one cannot start while this one is open. Follow it — or cancel it — in the document's Signatures panel; once it has ended you can ask again here.",
+			text(T("A document carries one signature request at a time, so a second one cannot start while this one is open. Follow it - or cancel it - in the document's Signatures panel; once it has ended you can ask again here.",
 				"Bir belge aynı anda tek bir imza isteği taşır; bu yüzden bu istek açıkken ikincisi başlatılamaz. İsteği belgenin İmzalar panelinden izleyin ya da iptal edin; istek sona erince buradan yeniden isteyebilirsiniz.")),
 		},
 	}

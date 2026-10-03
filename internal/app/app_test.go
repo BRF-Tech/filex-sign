@@ -67,7 +67,7 @@ func homeAs(t *testing.T, a *App, actor wire.Actor, event, actionID string, data
 	t.Helper()
 	in := &wire.ViewEventInput{ViewID: ViewHome, Event: event, ActionID: actionID,
 		Data:    data,
-		Context: wire.CallContext{Actor: &actor, Locale: "tr", Engines: map[string]bool{officeEngine: true}}}
+		Context: wire.CallContext{Actor: &actor, Locale: "tr"}}
 	if in.Data == nil {
 		in.Data = map[string]any{}
 	}
@@ -109,7 +109,7 @@ func viewInputAs(actor wire.Actor, view, event, actionID string, state, values m
 	in := &wire.ViewEventInput{ViewID: view, Event: event, ActionID: actionID, State: state,
 		Data: map[string]any{"values": values},
 		Context: wire.CallContext{Inputs: []wire.FileRef{{Ref: "in:0", Name: docName, Size: 1000}},
-			Actor: &actor, Locale: "tr", Engines: map[string]bool{officeEngine: true}}}
+			Actor: &actor, Locale: "tr"}}
 	if values == nil {
 		in.Data["values"] = map[string]any{}
 	}
@@ -402,16 +402,11 @@ func TestManifestRules(t *testing.T) {
 			if !contains(act.Applies.NoState, envelope.PendingKey) {
 				t.Errorf("%s should not be offered while a request is open", act.ID)
 			}
-			// ⚠ A PDF always; an office document ONLY while LibreOffice is
-			// there to turn it into one (applies.engine_ext — the host folds
-			// the list in when the engine is present). 2026-09-21, a tester:
-			// "Sign…" was offered on a .docx on an installation without it,
-			// and the click opened a page saying it could not be done.
-			if !equal(act.Applies.Ext, []string{"pdf"}) {
-				t.Errorf("%s: without LibreOffice only a PDF can be signed: %v", act.ID, act.Applies.Ext)
-			}
-			if !equal(act.Applies.EngineExt[officeEngine], OfficeExts) {
-				t.Errorf("%s: the manifest's office extensions and OfficeExts drifted: %v", act.ID, act.Applies.EngineExt)
+			// ⚠ A PDF, and only a PDF, whatever engines the server has: an
+			// office document is converted with the Convert app first
+			// (pdfonly_test.go).
+			if !equal(act.Applies.Ext, []string{"pdf"}) || len(act.Applies.EngineExt) != 0 {
+				t.Errorf("%s: only a PDF can be signed: %+v", act.ID, act.Applies)
 			}
 		case ActionFill:
 			// ⚠ Only to a person who has something to sign on it NOW: the
@@ -431,18 +426,6 @@ func TestManifestRules(t *testing.T) {
 		case ActionApply:
 			if !act.Hidden {
 				t.Error("apply is the second half of a flow, never a menu row")
-			}
-		case ActionConvert:
-			// The second half of "Convert to PDF": never a menu row, only an
-			// office document, a PDF written beside it.
-			if !act.Hidden {
-				t.Error("convert is queued by the office screen, never a menu row")
-			}
-			if !equal(act.Applies.Ext, OfficeExts) {
-				t.Errorf("convert applies to exactly the office documents: %v", act.Applies.Ext)
-			}
-			if act.Output.Mode != envelope.OutputSibling {
-				t.Errorf("the PDF goes beside the original: %+v", act.Output)
 			}
 		}
 	}
@@ -1591,57 +1574,6 @@ func TestLockFailureStopsTheRequestBeforeAnybodyIsInvited(t *testing.T) {
 	}
 }
 
-// ── office documents ───────────────────────────────────────────────────
-
-func TestOffice_ConvertsFirst(t *testing.T) {
-	a, f := newApp(t)
-	f.Engines[officeEngine] = true
-	pdfBytes := testpdf.Build(testpdf.Options{Pages: []testpdf.Page{testpdf.Letter()}})
-	f.EngineFn = func(req pluginkit.EngineRequest) (*pluginkit.EngineResult, error) {
-		return &pluginkit.EngineResult{Outputs: []wire.OutputRef{f.AddArtefact("in.pdf", pdfBytes)}}, nil
-	}
-	in := viewInput(ViewSignSelf, "open", "", nil, nil)
-	in.Context.Inputs[0].Name = "teklif.docx"
-	s, err := a.viewSignSelf(in)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(s.Actions) != 1 || s.Actions[0].ID != "convert" {
-		t.Fatalf("an office document offers one thing: %+v", s.Actions)
-	}
-	// Pressed as filex presses it (buttons_test.go): the button is primary.
-	in = viewInput(ViewSignSelf, "", "", nil, nil)
-	in.Context.Inputs[0].Name = "teklif.docx"
-	s = press(t, s, "convert", in, a.viewSignSelf)
-	job := jobFrom(t, s, burak, "teklif.docx")
-	f.Inputs["in:0"] = []byte("PK\x03\x04 not a pdf")
-	out, err := a.actionSign(job)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !out.OK || len(out.Outputs) != 1 || out.Outputs[0].Name != "teklif.pdf" {
-		t.Fatalf("the conversion should produce teklif.pdf: %+v / %v", out.Outputs, out.Message)
-	}
-}
-
-func TestOffice_WithoutLibreOfficeSaysSo(t *testing.T) {
-	a, f := newApp(t)
-	f.Engines[officeEngine] = false
-	in := viewInput(ViewRequest, "open", "", nil, nil)
-	in.Context.Inputs[0].Name = "teklif.docx"
-	in.Context.Engines[officeEngine] = false
-	s, err := a.viewRequest(in)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(s.Actions) != 0 {
-		t.Errorf("with nothing to convert with, offer nothing: %+v", s.Actions)
-	}
-	if !strings.Contains(surfaceWords(s), "LibreOffice") {
-		t.Error("the screen should say what is missing")
-	}
-}
-
 // ── odds and ends ──────────────────────────────────────────────────────
 
 func TestExpandName(t *testing.T) {
@@ -1661,7 +1593,7 @@ func TestInitialsOf(t *testing.T) {
 	if got := initialsOf("Burak Faruk Şahin"); got != "BFŞ" {
 		t.Errorf("initials → %q", got)
 	}
-	if got := initialsOf(""); got != "—" {
+	if got := initialsOf(""); got != "-" {
 		t.Errorf("no name → %q", got)
 	}
 }

@@ -104,7 +104,7 @@ var ErrFieldSigned = errors.New("pdfdoc: that signature field is already signed"
 // certification's P=2, hold.
 func PrepareSignature(in []byte, r SigRequest) (*Prepared, error) {
 	if r.Certify < 0 || r.Certify > 3 {
-		return nil, fmt.Errorf("pdfdoc: DocMDP permission %d is not 1–3", r.Certify)
+		return nil, fmt.Errorf("pdfdoc: DocMDP permission %d is not 1-3", r.Certify)
 	}
 	if r.Reserve <= 0 {
 		r.Reserve = 16 << 10

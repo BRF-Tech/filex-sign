@@ -137,7 +137,7 @@ func countSignatures(fields pdf.Value, depth int) int {
 // Box returns the box of a 1-based page, or an error.
 func (i *Info) Box(page int) (geometry.Box, error) {
 	if page < 1 || page > len(i.Pages) {
-		return geometry.Box{}, fmt.Errorf("page %d is out of range (1–%d)", page, len(i.Pages))
+		return geometry.Box{}, fmt.Errorf("page %d is out of range (1-%d)", page, len(i.Pages))
 	}
 	return i.Pages[page-1].Box, nil
 }

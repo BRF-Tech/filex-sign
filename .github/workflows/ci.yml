@@ -36,7 +36,7 @@ jobs:
           WANT="$(python3 -c "import json; print(json.load(open('filex-app.json', encoding='utf-8')).get('wasm', {}).get('sha256', ''))")"
           if [ -n "$WANT" ]; then
             GOT="$(cut -d' ' -f1 dist/plugin.wasm.sha256)"
-            test "$WANT" = "$GOT" || { echo "filex-app.json wasm.sha256 $WANT != built $GOT — run bash scripts/build.sh --stamp and commit"; exit 1; }
+            test "$WANT" = "$GOT" || { echo "filex-app.json wasm.sha256 $WANT != built $GOT - run bash scripts/build.sh --stamp and commit"; exit 1; }
           fi
       - uses: actions/upload-artifact@v4
         with:

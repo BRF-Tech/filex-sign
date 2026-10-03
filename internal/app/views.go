@@ -18,14 +18,19 @@ import (
 	"github.com/brf-tech/filex-sign/internal/views"
 )
 
-// office reports whether a screen is looking at a document that has to
-// go through LibreOffice before anything can be placed on it.
-func office(doc views.Doc, in *wire.ViewEventInput) (isOffice, engine bool) {
+// notPDF reports whether a screen is looking at a document that is not a
+// PDF, by its name: every page of this app works on a PDF's pages.
+//
+// ⚠ The menu offers "Sign…" and "Request signatures…" on PDFs alone
+// (manifest `applies`), so this is the screen a person reaches some other
+// way: a bookmarked or shared address, or a screen left open across the
+// upgrade that took the conversion out of this app (it used to offer
+// "Convert to PDF" here; that click now lands on this screen, never on a
+// job). A name with no extension may still be a PDF and goes on; the job
+// reads the bytes and refuses anything else.
+func notPDF(doc views.Doc) bool {
 	ext := extOf(doc.Name)
-	if ext == "pdf" || ext == "" {
-		return false, in.Context.Engines[officeEngine]
-	}
-	return isOfficeExt(ext), in.Context.Engines[officeEngine]
+	return ext != "" && ext != "pdf"
 }
 
 // jobOutput is the per-job output a surface attaches to the action it
@@ -60,11 +65,6 @@ func pressed(in *wire.ViewEventInput, id string) bool {
 	return in != nil && in.ActionID == id && (in.Event == "action" || in.Event == "submit")
 }
 
-func convertJob() *wire.Surface {
-	return &wire.Surface{Job: &wire.JobRequest{ActionID: ActionConvert, Params: map[string]any{"op": "convert"},
-		Output: &wire.Output{Mode: envelope.OutputSibling, Name: "{stem}.pdf"}}}
-}
-
 // ── sign yourself (a full page, three steps) ───────────────────────────
 
 func (a *App) viewSignSelf(in *wire.ViewEventInput) (*wire.Surface, error) {
@@ -74,11 +74,8 @@ func (a *App) viewSignSelf(in *wire.ViewEventInput) (*wire.Surface, error) {
 	if doc.ReadOnly {
 		return withPath(views.ReadOnlyDoc(l, doc, false), doc), nil
 	}
-	if isOffice, engine := office(doc, in); isOffice {
-		if pressed(in, "convert") {
-			return convertJob(), nil
-		}
-		return withPath(views.SignOffice(l, doc, engine), doc), nil
+	if notPDF(doc) {
+		return withPath(views.NotPDF(l, doc, false), doc), nil
 	}
 	st := selfStateOf(in)
 	st.IP = actorIP(in)
@@ -298,11 +295,8 @@ func (a *App) viewRequest(in *wire.ViewEventInput) (*wire.Surface, error) {
 	if doc.ReadOnly {
 		return withPath(views.ReadOnlyDoc(l, doc, true), doc), nil
 	}
-	if isOffice, engine := office(doc, in); isOffice {
-		if pressed(in, "convert") {
-			return convertJob(), nil
-		}
-		return withPath(views.RequestOffice(l, doc, engine), doc), nil
+	if notPDF(doc) {
+		return withPath(views.NotPDF(l, doc, true), doc), nil
 	}
 	// ⚠⚠ Asked on EVERY event, not only on open: somebody else may have
 	// sent a request on this document while this wizard was being filled
@@ -873,7 +867,6 @@ func (a *App) viewHome(in *wire.ViewEventInput) (*wire.Surface, error) {
 	ca := a.ca()
 	out := views.HomeInput{
 		CAOK: ca.OK, CAReason: ca.Reason, CAName: ca.Name, CAFP: ca.FP,
-		Office: in.Context.Engines[officeEngine],
 		// The actor carries an ACL role, not filex's own administrator
 		// flag, so this is the closest the guest can get. It only decides
 		// whether an extra SECTION is drawn: every row in it came through

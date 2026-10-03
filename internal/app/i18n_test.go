@@ -70,17 +70,17 @@ func TestEveryLanguage_ARequestFromInvitationToSeal(t *testing.T) {
 		{"es",
 			[]string{"le pide que firme un documento", "Abra este enlace para firmar"},
 			[]string{"El documento firmado está listo", "SHA-256 del archivo firmado", "Cómo comprobarlo", "bloqueado de forma permanente"},
-			[]string{"Registro de auditoría de firmas — ", "Certificación y sello", "Registro de eventos"},
+			[]string{"Registro de auditoría de firmas - ", "Certificación y sello", "Registro de eventos"},
 			[]string{"Todas las firmas son válidas", "Sellado por filex", "Certificado por"}},
 		{"de",
 			[]string{"bittet Sie, ein Dokument zu unterschreiben", "Öffnen Sie diesen Link, um zu unterschreiben"},
 			[]string{"Das unterschriebene Dokument ist fertig", "SHA-256 der unterschriebenen Datei", "So prüfen Sie das", "dauerhaft gesperrt"},
-			[]string{"Audit-Protokoll der Unterschriften – ", "Zertifizierung und Siegel", "Ereignisprotokoll"},
+			[]string{"Audit-Protokoll der Unterschriften - ", "Zertifizierung und Siegel", "Ereignisprotokoll"},
 			[]string{"Alle Unterschriften sind gültig", "Von filex versiegelt", "Zertifiziert von"}},
 		{"fr",
 			[]string{"vous demande de signer un document", "Ouvrez ce lien pour signer"},
 			[]string{"Le document signé est prêt", "SHA-256 du fichier signé", "Comment vérifier", "verrouillé définitivement"},
-			[]string{"Journal d’audit des signatures — ", "Certification et sceau", "Journal des événements"},
+			[]string{"Journal d’audit des signatures - ", "Certification et sceau", "Journal des événements"},
 			[]string{"Toutes les signatures sont valides", "Scellé par filex", "Certifié par"}},
 	} {
 		t.Run(c.lang, func(t *testing.T) {
@@ -184,7 +184,7 @@ func TestAudit_EveryLanguageIsInTheEmbeddedFace(t *testing.T) {
 	inter := fontkit.Get(fontkit.Inter)
 	must := map[views.Lang]string{
 		views.ES: "ßéñœÍ¿¡",
-		views.DE: "ßéñœäöü„“–",
+		views.DE: "ßéñœäöü„“",
 		views.FR: "ßéñœ«»’\u00a0\u202f",
 	}
 	for _, lang := range []views.Lang{views.EN, views.TR, views.ES, views.DE, views.FR} {

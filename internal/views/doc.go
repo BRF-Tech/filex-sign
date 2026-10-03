@@ -154,7 +154,7 @@ func StampLineOptions(labels []SignerLabel, authority string, now func() time.Ti
 				if len(lines) == 0 {
 					// Only an address can be missing: say it will be left
 					// out, which is what the paper will do.
-					ex[lang] = Lang(lang).S("(no e-mail address — left out)", "(e-posta adresi yok — yazılmaz)")
+					ex[lang] = Lang(lang).S("(no e-mail address - left out)", "(e-posta adresi yok - yazılmaz)")
 					continue
 				}
 				// As the stamp's face will print it: a name in a script

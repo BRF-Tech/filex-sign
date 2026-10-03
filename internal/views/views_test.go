@@ -60,20 +60,19 @@ func everySurface(t *testing.T, l Lang) map[string]*wire.Surface {
 	e := env()
 	labels := SignerLabels(e.Signers)
 	out := map[string]*wire.Surface{
-		"sign-self-1":           SignSelf(l, doc(), envelope.Person{Name: "Burak"}, SelfState{Step: SelfStepFields, Fields: e.Fields}, nil),
-		"sign-self-2":           SignSelf(l, doc(), envelope.Person{Name: "Burak"}, SelfState{Step: SelfStepFill, Fields: e.Fields}, nil),
-		"sign-self-3":           SignSelf(l, doc(), envelope.Person{Name: "Burak"}, SelfState{Step: SelfStepResult, Fields: e.Fields}, nil),
-		"office-sign":           SignOffice(l, Doc{Name: "a.docx"}, true),
-		"office-sign-no-engine": SignOffice(l, Doc{Name: "a.docx"}, false),
-		"office-request":        RequestOffice(l, Doc{Name: "a.docx"}, true),
-		"decline":               Decline(l, e, &e.Signers[0], nil),
-		"not-a-signer":          NotASigner(l, e, true),
-		"received":              Received(),
-		"gone":                  Gone(T("gone", "yok")),
-		"status":                Status(l, StatusInput{Doc: doc(), Env: e, SignaturesInFile: 1, CAName: "filex", CAFP: "AAAA"}),
-		"status-empty":          Status(l, StatusInput{Doc: doc(), SignaturesInFile: 2}),
-		"home":                  Home(l, HomeInput{CAOK: true, CAName: "filex", CAFP: "AAAA", Office: true, Admin: true}),
-		"home-cards": Home(l, HomeInput{CAOK: true, Office: false, Truncated: true,
+		"sign-self-1":     SignSelf(l, doc(), envelope.Person{Name: "Burak"}, SelfState{Step: SelfStepFields, Fields: e.Fields}, nil),
+		"sign-self-2":     SignSelf(l, doc(), envelope.Person{Name: "Burak"}, SelfState{Step: SelfStepFill, Fields: e.Fields}, nil),
+		"sign-self-3":     SignSelf(l, doc(), envelope.Person{Name: "Burak"}, SelfState{Step: SelfStepResult, Fields: e.Fields}, nil),
+		"not-pdf-sign":    NotPDF(l, Doc{Name: "a.docx"}, false),
+		"not-pdf-request": NotPDF(l, Doc{Name: "a.docx"}, true),
+		"decline":         Decline(l, e, &e.Signers[0], nil),
+		"not-a-signer":    NotASigner(l, e, true),
+		"received":        Received(),
+		"gone":            Gone(T("gone", "yok")),
+		"status":          Status(l, StatusInput{Doc: doc(), Env: e, SignaturesInFile: 1, CAName: "filex", CAFP: "AAAA"}),
+		"status-empty":    Status(l, StatusInput{Doc: doc(), SignaturesInFile: 2}),
+		"home":            Home(l, HomeInput{CAOK: true, CAName: "filex", CAFP: "AAAA", Admin: true}),
+		"home-cards": Home(l, HomeInput{CAOK: true, Truncated: true,
 			ToSign:    []Card{{Document: "a.pdf", Path: "docs://a.pdf", Status: envelope.StatusSent, Signed: 0, Total: 2, Waiting: "Gökçe"}},
 			Requested: []Card{{Document: "b.pdf", Path: "docs://b.pdf", Status: envelope.StatusInProgress, Signed: 1, Total: 2, Locked: true}},
 			Signed:    []Card{{Document: "c.pdf", Path: "docs://c.pdf", Status: envelope.StatusCompleted, Signed: 2, Total: 2}}}),
@@ -497,7 +496,7 @@ func TestStatusNamesIdentitiesNotAddresses(t *testing.T) {
 			t.Errorf("the panel does not mention %q", want)
 		}
 	}
-	if strings.Contains(body, "E-posta: —") || strings.Contains(body, "e-mail: —") {
+	if strings.Contains(body, "E-posta: -") || strings.Contains(body, "e-mail: -") {
 		t.Error("an empty half of an identity must not be printed")
 	}
 }
@@ -529,7 +528,7 @@ func TestVerifyHeadingIsWrittenInBothLanguages(t *testing.T) {
 				continue
 			}
 			txt, _ := n.Props["text"].(wire.Text)
-			if strings.Contains(txt["en"], "Signature 1 —") {
+			if strings.Contains(txt["en"], "Signature 1 -") {
 				heads = append(heads, txt)
 			}
 		}

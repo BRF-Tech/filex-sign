@@ -103,9 +103,9 @@ func Fill(l Lang, doc Doc, env *envelope.Envelope, sg *envelope.Signer, st FillS
 	// a form to fill in "signing" is asking them to agree to something
 	// nobody described.
 	signs := env.Signs(sg.ID)
-	title := Tf("Fill in %s", "%s — doldur", env.Document)
+	title := Tf("Fill in %s", "%s - doldur", env.Document)
 	if signs {
-		title = Tf("Sign %s", "%s — imzala", env.Document)
+		title = Tf("Sign %s", "%s - imzala", env.Document)
 	}
 	s := &wire.Surface{
 		Title:  title,
@@ -118,7 +118,7 @@ func Fill(l Lang, doc Doc, env *envelope.Envelope, sg *envelope.Signer, st FillS
 		return s
 	}
 	if !env.Turn(sg.ID) {
-		who := "—"
+		who := "-"
 		if n := env.Next(); n != nil {
 			who = n.Person.Display()
 		}
@@ -314,8 +314,8 @@ func FieldForm(l Lang, all, fs []envelope.Field, held map[string]string) []wire.
 		n = append(n, pads...)
 	}
 	if len(typed) == 0 && len(pads) == 0 {
-		n = append(n, info(T("Nothing has to be filled in — go on and approve the document.",
-			"Doldurulacak bir şey yok — devam edip belgeyi onaylayın.")))
+		n = append(n, info(T("Nothing has to be filled in - go on and approve the document.",
+			"Doldurulacak bir şey yok - devam edip belgeyi onaylayın.")))
 	}
 	return n
 }
@@ -398,7 +398,7 @@ func reviewFillNodes(l Lang, doc Doc, env *envelope.Envelope, sg *envelope.Signe
 		v := st.Values[f.ID]
 		shown := Plain(v)
 		if p := AsPrinted(fontkit.Get(fields.NormalizeFont(f.Font)), v); p != v && !fields.Drawn(f.Type) && f.Type != fields.TypeCheckbox {
-			shown = Tf("%s — printed as “%s”", "%s — “%s” olarak basılacak", v, p)
+			shown = Tf("%s - printed as “%s”", "%s - “%s” olarak basılacak", v, p)
 		}
 		switch {
 		case fields.Drawn(f.Type):
@@ -527,7 +527,7 @@ func signerNames(env *envelope.Envelope) string {
 		}
 	}
 	if len(names) == 0 {
-		return "—"
+		return "-"
 	}
 	return strings.Join(names, ", ")
 }

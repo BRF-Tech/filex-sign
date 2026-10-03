@@ -79,44 +79,17 @@ func TestTurkish_JobFailuresAreSaidInTurkish(t *testing.T) {
 		noEnglish(t, "signing is off", tr, "is not set")
 	})
 
-	convert := func(t *testing.T, engine func(pluginkit.EngineRequest) (*pluginkit.EngineResult, error)) string {
-		t.Helper()
+	t.Run("a document that is not a PDF", func(t *testing.T) {
 		a, f := newApp(t)
-		f.Engines[officeEngine] = true
-		f.EngineFn = engine
 		f.Inputs["in:0"] = []byte("PK\x03\x04 an office document")
-		return turkishFailure(t, func() (*wire.ActionRunOutput, error) {
+		tr := turkishFailure(t, func() (*wire.ActionRunOutput, error) {
 			return a.actionSign(&wire.ActionRunInput{ActionID: ActionSign, Locale: "tr", Actor: burak,
-				Params: map[string]any{"op": "convert"},
 				Inputs: []wire.FileRef{{Ref: "in:0", Name: "teklif.docx", Size: 1000}}})
 		})
-	}
-	t.Run("LibreOffice made nothing", func(t *testing.T) {
-		tr := convert(t, func(pluginkit.EngineRequest) (*pluginkit.EngineResult, error) {
-			return &pluginkit.EngineResult{Exit: 1, StderrTail: "Error: source file could not be loaded"}, nil
-		})
-		if !strings.Contains(tr, "LibreOffice “teklif.docx” belgesini PDF'e çeviremedi") {
-			t.Errorf("the failure is not said in Turkish: %q", tr)
+		if !strings.Contains(tr, "“teklif.docx” bir PDF değil") {
+			t.Errorf("the refusal is not said in Turkish: %q", tr)
 		}
-		noEnglish(t, "LibreOffice made nothing", tr, "produced", "source file", "could not be loaded", "exit")
-	})
-	t.Run("LibreOffice ran out of time", func(t *testing.T) {
-		tr := convert(t, func(pluginkit.EngineRequest) (*pluginkit.EngineResult, error) {
-			return nil, &pluginkit.HostError{Code: wire.ErrTimeout, Message: "engine run exceeded 180s"}
-		})
-		if !strings.Contains(tr, "zamanında PDF'e çeviremedi") {
-			t.Errorf("a timeout is not said in Turkish: %q", tr)
-		}
-		noEnglish(t, "timeout", tr, "exceeded", "timeout")
-	})
-	t.Run("LibreOffice went away", func(t *testing.T) {
-		tr := convert(t, func(pluginkit.EngineRequest) (*pluginkit.EngineResult, error) {
-			return nil, &pluginkit.HostError{Code: wire.ErrUnavailable, Message: "engine libreoffice is not installed on this host"}
-		})
-		if !strings.Contains(tr, "LibreOffice yok") {
-			t.Errorf("a missing LibreOffice is not said in Turkish: %q", tr)
-		}
-		noEnglish(t, "engine gone", tr, "not installed", "engine")
+		noEnglish(t, "not a PDF", tr, "not a PDF", "Convert app", "office program", "LibreOffice")
 	})
 
 	t.Run("a reminder the host refused", func(t *testing.T) {

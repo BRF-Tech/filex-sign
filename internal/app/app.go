@@ -28,10 +28,6 @@ const (
 	ActionFill    = "fill"
 	ActionApply   = "apply"
 	ActionVerify  = "verify"
-	// ActionConvert is the hidden second half of "Convert to PDF": its own
-	// action so the operations tray names what is happening ("PDF'e
-	// dönüştür"), not "Sign…".
-	ActionConvert = "convert"
 	ViewSignSelf  = "sign-self"
 	ViewRequest   = "request"
 	ViewFill      = "sign-fill"
@@ -80,8 +76,6 @@ const (
 	receiptTTLDays  = 30
 	docRef          = "in:0"
 	pubRef          = "pub:0"
-	officeEngine    = "libreoffice"
-	convertTimeoutS = 180
 )
 
 // App is the plugin.
@@ -148,10 +142,9 @@ func (a *App) Plugin() *pluginkit.Plugin {
 			// "Sign / Fill" is the menu row a signer uses while a request is
 			// open; its screen queues `apply`, and a direct run means the
 			// same thing, so it lands in the same handler.
-			ActionFill:    call(a.actionApply),
-			ActionApply:   call(a.actionApply),
-			ActionVerify:  call(a.actionVerify),
-			ActionConvert: call(a.actionConvert),
+			ActionFill:   call(a.actionApply),
+			ActionApply:  call(a.actionApply),
+			ActionVerify: call(a.actionVerify),
 		},
 		Views: map[string]pluginkit.ViewFunc{
 			ViewSignSelf: call(a.viewSignSelf),

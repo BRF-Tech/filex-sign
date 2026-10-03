@@ -47,12 +47,6 @@ type Fake struct {
 	// LockReasons: the manifest message each lock was taken with (FileLockMessage).
 	LockReasons map[string]string
 
-	// Engines says which heavy binaries this "host" has, and EngineFn
-	// stands in for running them.
-	Engines    map[string]bool
-	EngineFn   func(req pluginkit.EngineRequest) (*pluginkit.EngineResult, error)
-	EngineRuns []pluginkit.EngineRequest
-
 	// Network is what Asset can download: URL → bytes. Offline makes every
 	// download fail the way an installation with no internet does; the
 	// cache (by sha256) still answers. Downloads lists every URL actually
@@ -160,7 +154,7 @@ func NewFake() *Fake {
 		Settings: map[string]string{},
 		Clock:    clock, CA: ca,
 		keys: map[string]*testca.Leaf{}, Destroyed: map[string]bool{},
-		Locks: map[string]time.Time{}, Engines: map[string]bool{}, LockReasons: map[string]string{},
+		Locks: map[string]time.Time{}, LockReasons: map[string]string{},
 		PINUnrecoverable: map[string]bool{},
 	}
 }
@@ -241,40 +235,6 @@ func (f *Fake) LockedRefs() []string {
 	}
 	sort.Strings(out)
 	return out
-}
-
-// ── engines ────────────────────────────────────────────────────────────
-
-func (f *Fake) EngineAvailable(name string) bool {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	return f.Engines[name]
-}
-
-func (f *Fake) EngineRun(req pluginkit.EngineRequest) (*pluginkit.EngineResult, error) {
-	f.mu.Lock()
-	if !f.Engines[req.Engine] {
-		f.mu.Unlock()
-		return nil, &pluginkit.HostError{Code: wire.ErrUnavailable, Message: "engine " + req.Engine + " is not installed on this host"}
-	}
-	f.EngineRuns = append(f.EngineRuns, req)
-	fn := f.EngineFn
-	f.mu.Unlock()
-	if fn == nil {
-		return nil, &pluginkit.HostError{Code: wire.ErrInternal, Message: "no engine behaviour configured in this test"}
-	}
-	return fn(req)
-}
-
-// AddArtefact registers a file an engine "produced" so the plugin can
-// read it back through ReadInput.
-func (f *Fake) AddArtefact(name string, data []byte) wire.OutputRef {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	f.ids++
-	ref := fmt.Sprintf("eng:%d", f.ids)
-	f.Inputs[ref] = append([]byte(nil), data...)
-	return wire.OutputRef{Ref: ref, Name: name}
 }
 
 func (f *Fake) ReadInput(ref string) ([]byte, error) {

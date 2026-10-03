@@ -32,7 +32,7 @@ func TestDatesAreWrittenInEachLanguagesWords(t *testing.T) {
 		t.Errorf("When in Turkish: %q", got)
 	}
 	span := SpanText(time.Date(2026, 9, 22, 0, 0, 0, 0, time.UTC), time.Date(2027, 9, 22, 0, 0, 0, 0, time.UTC))
-	if span[string(EN)] != "Sep 22, 2026 – Sep 22, 2027" || span[string(TR)] != "22 Eyl 2026 – 22 Eyl 2027" {
+	if span[string(EN)] != "Sep 22, 2026 - Sep 22, 2027" || span[string(TR)] != "22 Eyl 2026 - 22 Eyl 2027" {
 		t.Errorf("Span: %v", span)
 	}
 	cell := DayText("2026-09-29")

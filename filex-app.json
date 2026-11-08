@@ -1,7 +1,7 @@
 {
   "manifest_version": 1,
   "name": "sign",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "label": {
     "en": "e-Signature",
     "tr": "e-İmza",
@@ -502,6 +502,6 @@
   },
   "wasm": {
     "url": "https://github.com/BRF-Tech/filex-sign/releases/download/{tag}/plugin.wasm",
-    "sha256": "6a3d2e59aaadb9c69bd219652d2078787e09520f9b7da223646e9dd131396ff3"
+    "sha256": "4306797f3a07fda1b4ee994ccb677988d3e0cb538aaba253e554fd2be5a42005"
   }
 }

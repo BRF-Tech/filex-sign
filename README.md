@@ -425,8 +425,10 @@ scripts/fonts.py        regenerates the embedded font subsets from google/fonts
 docs/SIGN.md            the long version of this page
 ```
 
-Go 1.27 (the pinned `digitorus/pdfsign` needs it; `GOTOOLCHAIN=auto` fetches
-it). No cgo, no TinyGo.
+Go: the toolchain `go.mod` pins (`toolchain go1.27.3`; the pinned
+`digitorus/pdfsign` needs Go 1.27), which the scripts force through
+`GOTOOLCHAIN` - Go downloads it when another version is installed, so a
+build anywhere makes the release's bytes. No cgo, no TinyGo.
 
 ```bash
 go test ./...                       # everything runs on the host, no wasm runtime needed

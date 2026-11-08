@@ -17,11 +17,15 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
           cache: true
+      # The compiler scripts/build.sh forces, so the tests and the build here
+      # are the ones a release runs (go.mod `toolchain`).
+      - name: Use the toolchain go.mod pins
+        run: echo "GOTOOLCHAIN=$(sed -n 's/^toolchain //p' go.mod)" >> "$GITHUB_ENV"
       - name: test
         run: go test ./... -count=1
       - name: version must match the tag
@@ -31,8 +35,15 @@ jobs:
           test "$TAG" = "$VER" || { echo "filex-app.json version $VER != tag $TAG"; exit 1; }
       - name: build + stamp sha256
         run: bash scripts/build.sh --stamp
+      # filex-app.json at the tag is what filex installs from, and it carries
+      # the module's sha256: the build here must give exactly that module, or
+      # an install from the tag is refused (sha256_mismatch). --stamp above
+      # rewrote the file with this build's hash, so any difference is one.
+      - name: the committed sha256 is this build's
+        run: |
+          git diff --exit-code -- filex-app.json || { echo "filex-app.json at the tag does not carry this build's sha256 - run bash scripts/build.sh --stamp, commit, tag again"; exit 1; }
       - name: release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         with:
           files: |
             dist/plugin.wasm

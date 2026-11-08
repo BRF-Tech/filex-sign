@@ -12,11 +12,15 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
           cache: true
+      # The compiler scripts/build.sh forces, so the tests and the build here
+      # are the ones a release runs (go.mod `toolchain`).
+      - name: Use the toolchain go.mod pins
+        run: echo "GOTOOLCHAIN=$(sed -n 's/^toolchain //p' go.mod)" >> "$GITHUB_ENV"
       - name: gofmt
         run: test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
       - name: vet
@@ -38,7 +42,7 @@ jobs:
             GOT="$(cut -d' ' -f1 dist/plugin.wasm.sha256)"
             test "$WANT" = "$GOT" || { echo "filex-app.json wasm.sha256 $WANT != built $GOT - run bash scripts/build.sh --stamp and commit"; exit 1; }
           fi
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: plugin-wasm
           path: |

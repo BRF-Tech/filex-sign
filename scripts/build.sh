@@ -18,9 +18,20 @@
 #                     the manifest is embedded in the module, so a stamped
 #                     manifest would change the very hash it records. The
 #                     field is emptied for the build and put back after.
+#   another compiler  the toolchain is the one go.mod pins (`toolchain
+#                     goX.Y.Z`), forced through GOTOOLCHAIN; Go downloads it
+#                     when this machine has another version. It used to be
+#                     GOTOOLCHAIN=auto against `go 1.27.0`, which builds with
+#                     whatever newer Go is installed here - other bytes than
+#                     the release workflow's.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-export GOTOOLCHAIN="${GOTOOLCHAIN:-auto}"
+pinned="$(sed -n 's/^toolchain //p' go.mod)"
+if [ -z "$pinned" ]; then
+  echo "go.mod has no 'toolchain goX.Y.Z' line: the build could not be reproduced elsewhere" >&2
+  exit 1
+fi
+export GOTOOLCHAIN="$pinned"
 
 # The tests run BEFORE the module is built, and a failure means no module.
 # A wasm that was never checked is worse than no wasm: it installs, it

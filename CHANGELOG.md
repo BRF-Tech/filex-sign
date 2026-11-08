@@ -6,6 +6,45 @@ All notable changes to filex-sign are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-11-08
+
+A patch release: the libraries the module is built from, the Noto font
+table and the compiler move to their current versions. Still **filex
+v0.49.0** or later, and the same permissions.
+
+### Changed
+- **The PDF libraries are the released ones:** `github.com/digitorus/pdfsign`
+  v1.0.0-rc2 → v1.0.0 (the verifier behind **Verify**) and
+  `github.com/digitorus/pdf` v0.2.0 → v0.3.0 (the PDF reader), with
+  `github.com/digitorus/pkcs7` and `github.com/digitorus/timestamp` at their
+  latest commits. The final pdfsign also finds a signature an incremental
+  update removed from the form or repointed (it is reported, never as
+  valid), names the CMS signer's own certificate first whatever order the
+  signature stores them in, and reports a timestamp as valid only when its
+  authority's certificate checks out. Verify's "time proven" already went
+  by that check, so it reads the same.
+- `golang.org/x/crypto` v0.55.0 → v0.58.0, `golang.org/x/image` v0.45.0 →
+  v0.47.0, `golang.org/x/text` v0.41.0 → v0.43.0, `golang.org/x/sys` v0.47.0
+  → v0.49.0.
+- **Noto fonts for non-Latin text** (fetched on demand, pinned by URL and
+  sha256): the table is regenerated against today's Google Fonts. Seven
+  faces have a new release - Noto Sans Devanagari, Georgian, JP, KR, SC, TC
+  and Noto Serif Toto; all 161 pinned faces were downloaded and checked
+  against their pins (`FILEX_SIGN_VERIFY_ALL_FONTS=1`). The five embedded
+  faces (Caveat, Dancing Script, Homemade Apple, Inter, Source Serif 4) are
+  unchanged: their sources in google/fonts have not changed.
+- **The compiler is pinned in `go.mod`:** `toolchain go1.27.3`. The build used
+  `GOTOOLCHAIN=auto` against `go 1.27.0`, which builds with whatever newer Go
+  is installed on the machine; every script now forces the pinned toolchain,
+  and CI and the release workflow read it from `go.mod`.
+- The release workflow refuses to publish unless the tag's `filex-app.json`
+  carries the sha256 of the module it builds, as CI already checked on every
+  push.
+- CI: the GitHub Actions are pinned by commit SHA, at their current versions
+  (checkout v7.0.1, setup-go v7.0.0, upload-artifact v7.0.2,
+  action-gh-release v3.0.4).
+- The module is 21.0 MB, was 20.8 MB.
+
 ## [0.3.0] - 2026-10-02
 
 A minor version: a capability goes away. Still **filex v0.49.0** or later,
@@ -672,7 +711,8 @@ The MVP (M1) of the e-signature app for filex's app-plugin platform.
 - Host-side test harness (`internal/host.Fake` + throw-away CA) covering
   the whole flow without a wasm runtime.
 
-[Unreleased]: https://github.com/BRF-Tech/filex-sign/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/BRF-Tech/filex-sign/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/BRF-Tech/filex-sign/releases/tag/v0.3.1
 [0.3.0]: https://github.com/BRF-Tech/filex-sign/releases/tag/v0.3.0
 [0.2.0]: https://github.com/BRF-Tech/filex-sign/releases/tag/v0.2.0
 [0.1.1]: https://github.com/BRF-Tech/filex-sign/releases/tag/v0.1.1

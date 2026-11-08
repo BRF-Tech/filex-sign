@@ -6,6 +6,12 @@ All notable changes to filex-sign are listed here. The format follows
 
 ## [Unreleased]
 
+### Changed
+- A release's notes on GitHub are its section of this file, as in the other
+  filex apps; they were GitHub's generated list of pull requests, which is
+  what filex showed an administrator when it offered the update. (0.3.1's
+  notes were set to its section by hand.)
+
 ## [0.3.1] - 2026-11-08
 
 A patch release: the libraries the module is built from, the Noto font

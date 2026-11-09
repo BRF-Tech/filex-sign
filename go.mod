@@ -18,5 +18,5 @@ require (
 
 require (
 	github.com/extism/go-pdk v1.1.3 // indirect
-	golang.org/x/sys v0.49.0 // indirect
+	golang.org/x/sys v0.50.0 // indirect
 )

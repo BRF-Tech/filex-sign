@@ -13,7 +13,7 @@ require (
 	github.com/go-text/typesetting v0.3.5
 	golang.org/x/crypto v0.58.0
 	golang.org/x/image v0.47.0
-	golang.org/x/text v0.43.0
+	golang.org/x/text v0.44.0
 )
 
 require (

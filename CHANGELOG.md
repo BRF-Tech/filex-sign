@@ -6,6 +6,8 @@ All notable changes to filex-sign are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-11-10
+
 ### Changed
 - A release's notes on GitHub are its section of this file, as in the other
   filex apps; they were GitHub's generated list of pull requests, which is
@@ -720,6 +722,7 @@ The MVP (M1) of the e-signature app for filex's app-plugin platform.
   the whole flow without a wasm runtime.
 
 [Unreleased]: https://github.com/BRF-Tech/filex-sign/compare/v0.3.1...HEAD
+[0.3.2]: https://github.com/BRF-Tech/filex-sign/releases/tag/v0.3.2
 [0.3.1]: https://github.com/BRF-Tech/filex-sign/releases/tag/v0.3.1
 [0.3.0]: https://github.com/BRF-Tech/filex-sign/releases/tag/v0.3.0
 [0.2.0]: https://github.com/BRF-Tech/filex-sign/releases/tag/v0.2.0

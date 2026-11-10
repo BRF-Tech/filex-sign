@@ -12,6 +12,7 @@ All notable changes to filex-sign are listed here. The format follows
   what filex showed an administrator when it offered the update. (0.3.1's
   notes were set to its section by hand.)
 - golang.org/x/sys v0.50.0 (was v0.49.0).
+- golang.org/x/image v0.48.0 (was v0.47.0).
 
 ## [0.3.1] - 2026-11-08
 

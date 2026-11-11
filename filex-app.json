@@ -502,6 +502,6 @@
   },
   "wasm": {
     "url": "https://github.com/BRF-Tech/filex-sign/releases/download/{tag}/plugin.wasm",
-    "sha256": "b78e9fc486fcfc8e9b9a56b00cd82994383f1009a358f1c66890f1a8f441f980"
+    "sha256": "cdc578829192c8ffb703266ff34df8f2a0c6d26093f8bd7eb1b35fd6013ca0c9"
   }
 }

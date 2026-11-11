@@ -6,6 +6,10 @@ All notable changes to filex-sign are listed here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- golang.org/x/crypto v0.59.0 (was v0.58.0).
+
 ## [0.3.2] - 2026-11-10
 
 ### Changed

@@ -6,6 +6,8 @@ All notable changes to filex-sign are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.3.3] - 2026-11-13
+
 ### Changed
 
 - golang.org/x/crypto v0.59.0 (was v0.58.0).
@@ -726,6 +728,7 @@ The MVP (M1) of the e-signature app for filex's app-plugin platform.
   the whole flow without a wasm runtime.
 
 [Unreleased]: https://github.com/BRF-Tech/filex-sign/compare/v0.3.1...HEAD
+[0.3.3]: https://github.com/BRF-Tech/filex-sign/releases/tag/v0.3.3
 [0.3.2]: https://github.com/BRF-Tech/filex-sign/releases/tag/v0.3.2
 [0.3.1]: https://github.com/BRF-Tech/filex-sign/releases/tag/v0.3.1
 [0.3.0]: https://github.com/BRF-Tech/filex-sign/releases/tag/v0.3.0
